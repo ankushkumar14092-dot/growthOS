@@ -15,8 +15,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  const port = Number(process.env.API_PORT ?? 4000);
-  await app.listen(port);
+  // PORT is set by Railway/Fly/Render; API_PORT kept for local .env
+  const port = Number(process.env.PORT ?? process.env.API_PORT ?? 4000);
+  await app.listen(port, "0.0.0.0");
   // eslint-disable-next-line no-console
   console.log(`AI-Growth-OS API listening on http://localhost:${port}`);
 }

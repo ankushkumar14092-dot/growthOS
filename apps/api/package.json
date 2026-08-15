@@ -7,7 +7,7 @@
     "build": "nest build",
     "start": "node dist/main.js",
     "typecheck": "tsc -p tsconfig.json --noEmit --incremental false",
-    "test": "tsx --test src/scans/html-extract.spec.ts src/proposals/proposal-engine.spec.ts src/deployments/verify-engine.spec.ts",
+    "test": "tsx --test src/scans/html-extract.spec.ts src/proposals/proposal-engine.spec.ts src/deployments/verify-engine.spec.ts src/deployments/github-pr-deploy.service.spec.ts",
     "lint": "echo \"lint stub — add eslint in Phase 1\"",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",

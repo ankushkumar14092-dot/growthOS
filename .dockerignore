@@ -1,0 +1,15 @@
+node_modules
+**/node_modules
+**/dist
+**/.next
+.git
+.cursor
+coverage
+**/*.tsbuildinfo
+.env
+.env.*
+!.env.example
+apps/api/storage
+apps/web/.env.local
+*.log
+.DS_Store
