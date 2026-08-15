@@ -3,7 +3,7 @@ set -e
 cd /app/apps/api
 
 # Idempotent repair: only if Phase 5 is stuck unfinished (missing patches FK failure).
-npx prisma db execute --stdin <<'SQL'
+npx prisma db execute --schema prisma/schema.prisma --stdin <<'SQL'
 DO $$
 BEGIN
   IF EXISTS (
@@ -20,5 +20,5 @@ BEGIN
 END $$;
 SQL
 
-npx prisma migrate deploy
+npx prisma migrate deploy --schema prisma/schema.prisma
 exec node dist/main.js
