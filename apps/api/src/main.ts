@@ -6,7 +6,10 @@ import { initSentry } from "./sentry";
 async function bootstrap() {
   await initSentry();
   const app = await NestFactory.create(AppModule);
-  const origin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
+  const rawOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
+  const origin = rawOrigin.includes(",")
+    ? rawOrigin.split(",").map((o) => o.trim()).filter(Boolean)
+    : rawOrigin;
   app.enableCors({ origin, credentials: true });
   app.useGlobalPipes(
     new ValidationPipe({
