@@ -1,0 +1,342 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MembershipRole {
+  owner
+  member
+}
+
+enum PlanTier {
+  free
+  starter
+  agency
+}
+
+enum ConnectionType {
+  wordpress
+  github
+  zip
+  url_audit
+}
+
+enum CredentialKind {
+  plugin_token
+  app_password
+  github_token
+  zip_storage
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique @db.VarChar(255)
+  passwordHash String?   @map("password_hash") @db.VarChar(255)
+  authSubject  String?   @map("auth_subject") @db.VarChar(255)
+  profile      Json      @default("{}")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  memberships Membership[]
+  auditLogs   AuditLog[]
+
+  @@map("users")
+}
+
+model Organization {
+  id               String    @id @default(uuid())
+  name             String    @db.VarChar(150)
+  plan             PlanTier  @default(free)
+  settings         Json      @default("{}")
+  stripeCustomerId String?   @map("stripe_customer_id") @db.VarChar(255)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt        DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  memberships   Membership[]
+  sites         Site[]
+  auditLogs     AuditLog[]
+  subscriptions Subscription[]
+  usageEvents   UsageEvent[]
+
+  @@map("organizations")
+}
+
+model Membership {
+  id             String         @id @default(uuid())
+  userId         String         @map("user_id")
+  organizationId String         @map("organization_id")
+  role           MembershipRole
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@map("memberships")
+}
+
+model Site {
+  id             String         @id @default(uuid())
+  organizationId String         @map("organization_id")
+  domain         String         @db.VarChar(255)
+  connectionType ConnectionType @default(wordpress) @map("connection_type")
+  cms            String         @default("wordpress") @db.VarChar(30)
+  settings       Json           @default("{}")
+  healthStatus   String?        @map("health_status") @db.VarChar(30)
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt      DateTime?      @map("deleted_at") @db.Timestamptz(6)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  credential   Credential?
+  jobRuns      JobRun[]
+  proposals    Proposal[]
+  patches      Patch[]
+  deployments  Deployment[]
+
+  @@index([organizationId])
+  @@map("sites")
+}
+
+model Credential {
+  id               String         @id @default(uuid())
+  siteId           String         @unique @map("site_id")
+  kind             CredentialKind
+  secretCiphertext Bytes          @map("secret_ciphertext")
+  meta             Json           @default("{}")
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("credentials")
+}
+
+model JobRun {
+  id           String    @id @default(uuid())
+  siteId       String    @map("site_id")
+  status       String    @db.VarChar(30)
+  errorCode    String?   @map("error_code") @db.VarChar(64)
+  errorMessage String?   @map("error_message") @db.Text
+  startedAt    DateTime? @map("started_at") @db.Timestamptz(6)
+  finishedAt   DateTime? @map("finished_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  site   Site    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  crawl  Crawl?
+  issues Issue[]
+  proposals Proposal[]
+
+  @@index([siteId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("job_runs")
+}
+
+model Crawl {
+  id             String   @id @default(uuid())
+  jobRunId       String   @unique @map("job_run_id")
+  pageCount      Int      @default(0) @map("page_count")
+  snapshotPrefix String?  @map("snapshot_prefix") @db.VarChar(512)
+  meta           Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  jobRun JobRun @relation(fields: [jobRunId], references: [id], onDelete: Cascade)
+  pages  Page[]
+
+  @@map("crawls")
+}
+
+model Page {
+  id         String   @id @default(uuid())
+  crawlId    String   @map("crawl_id")
+  url        String   @db.Text
+  httpStatus Int?     @map("http_status")
+  extracted  Json     @default("{}")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  crawl  Crawl   @relation(fields: [crawlId], references: [id], onDelete: Cascade)
+  issues Issue[]
+
+  @@index([crawlId])
+  @@map("pages")
+}
+
+model Issue {
+  id         String   @id @default(uuid())
+  jobRunId   String   @map("job_run_id")
+  pageId     String?  @map("page_id")
+  issueType  String   @map("issue_type") @db.VarChar(50)
+  severity   String   @db.VarChar(20)
+  evidence   Json     @default("{}")
+  resolved   Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  jobRun JobRun @relation(fields: [jobRunId], references: [id], onDelete: Cascade)
+  page   Page?  @relation(fields: [pageId], references: [id], onDelete: SetNull)
+  proposals Proposal[]
+
+  @@index([jobRunId, severity])
+  @@map("issues")
+}
+
+model Proposal {
+  id              String   @id @default(uuid())
+  siteId          String   @map("site_id")
+  issueId         String   @map("issue_id")
+  jobRunId        String   @map("job_run_id")
+  proposalType    String   @map("proposal_type") @db.VarChar(40)
+  beforeValue     String   @map("before_value") @db.Text
+  afterValue      String   @map("after_value") @db.Text
+  businessImpact  String   @map("business_impact") @db.Text
+  impactType      String   @map("impact_type") @db.VarChar(40)
+  reasoning       String   @db.Text
+  confidence      Int
+  changeClass     String   @map("change_class") @db.VarChar(20)
+  status          String   @db.VarChar(30)
+  source          String   @db.VarChar(20)
+  model           String?  @db.VarChar(80)
+  promptVersion   String?  @map("prompt_version") @db.VarChar(40)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  site     Site            @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  issue    Issue           @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  jobRun   JobRun          @relation(fields: [jobRunId], references: [id], onDelete: Cascade)
+  patch    Patch?
+  events   ProposalEvent[]
+
+  @@index([siteId, status])
+  @@index([jobRunId])
+  @@index([issueId])
+  @@map("proposals")
+}
+
+model ProposalEvent {
+  id         String   @id @default(uuid())
+  proposalId String   @map("proposal_id")
+  event      String   @db.VarChar(40)
+  actor      String   @db.VarChar(20)
+  meta       Json     @default("{}")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([proposalId, createdAt(sort: Desc)])
+  @@map("proposal_events")
+}
+
+model Patch {
+  id          String   @id @default(uuid())
+  proposalId  String   @unique @map("proposal_id")
+  siteId      String   @map("site_id")
+  changeClass String   @map("change_class") @db.VarChar(20)
+  target      Json
+  beforeState Json     @map("before_state")
+  afterState  Json     @map("after_state")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  proposal    Proposal     @relation(fields: [proposalId], references: [id], onDelete: Restrict)
+  site        Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  deployments Deployment[]
+
+  @@index([siteId, changeClass])
+  @@map("patches")
+}
+
+model Deployment {
+  id                 String    @id @default(uuid())
+  siteId             String    @map("site_id")
+  patchId            String    @map("patch_id")
+  proposalId         String?   @map("proposal_id")
+  jobRunId           String?   @map("job_run_id")
+  action             String    @db.VarChar(20)
+  status             String    @db.VarChar(30)
+  backup             Json      @default("{}")
+  verifyResult       Json?     @map("verify_result")
+  errorMessage       String?   @map("error_message") @db.Text
+  rollbackOfId       String?   @map("rollback_of_id")
+  startedAt          DateTime? @map("started_at") @db.Timestamptz(6)
+  completedAt        DateTime? @map("completed_at") @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  site     Site              @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  patch    Patch             @relation(fields: [patchId], references: [id], onDelete: Restrict)
+  events   DeploymentEvent[]
+  rollbackOf Deployment?     @relation("DeploymentRollback", fields: [rollbackOfId], references: [id], onDelete: SetNull)
+  rollbacks  Deployment[]    @relation("DeploymentRollback")
+
+  @@index([siteId, createdAt(sort: Desc)])
+  @@index([patchId, action])
+  @@index([status])
+  @@map("deployments")
+}
+
+model DeploymentEvent {
+  id           String   @id @default(uuid())
+  deploymentId String   @map("deployment_id")
+  event        String   @db.VarChar(40)
+  message      String?  @db.Text
+  meta         Json     @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  deployment Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+
+  @@index([deploymentId, createdAt(sort: Asc)])
+  @@map("deployment_events")
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  actorUserId    String?  @map("actor_user_id")
+  action         String   @db.VarChar(80)
+  resourceType   String   @map("resource_type") @db.VarChar(40)
+  resourceId     String?  @map("resource_id") @db.VarChar(64)
+  meta           Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actor        User?        @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+model Subscription {
+  id                   String    @id @default(uuid())
+  organizationId       String    @map("organization_id")
+  plan                 PlanTier  @default(free)
+  stripeSubscriptionId String?   @map("stripe_subscription_id") @db.VarChar(255)
+  stripePriceId        String?   @map("stripe_price_id") @db.VarChar(255)
+  active               Boolean   @default(true)
+  periodStart          DateTime? @map("period_start") @db.Date
+  periodEnd            DateTime? @map("period_end") @db.Date
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("subscriptions")
+}
+
+model UsageEvent {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  metric         String   @db.VarChar(50)
+  quantity       Decimal  @default(1) @db.Decimal(12, 2)
+  meta           Json     @default("{}")
+  occurredAt     DateTime @default(now()) @map("occurred_at") @db.Timestamptz(6)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, occurredAt(sort: Desc)])
+  @@index([organizationId, metric])
+  @@map("usage_events")
+}

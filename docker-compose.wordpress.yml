@@ -1,0 +1,41 @@
+# Optional staging WordPress for real plugin E2E (not started by default `db:up`)
+# Usage: npm run wp:up
+services:
+  wordpress-db:
+    image: mysql:8.0
+    container_name: growthos-wp-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - growthos_wp_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uwordpress", "-pwordpress"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:6.7-php8.2-apache
+    container_name: growthos-wordpress
+    restart: unless-stopped
+    depends_on:
+      wordpress-db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: wordpress-db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - growthos_wp_data:/var/www/html
+      - ./wordpress-plugin/ai-growth-os:/var/www/html/wp-content/plugins/ai-growth-os
+
+volumes:
+  growthos_wp_db:
+  growthos_wp_data:

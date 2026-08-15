@@ -1,0 +1,25 @@
+{
+  "name": "ai-growth-os",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:web": "npm run dev -w @ai-growth-os/web",
+    "dev:api": "npm run dev -w @ai-growth-os/api",
+    "build": "npm run build -w @ai-growth-os/shared && npm run build -w @ai-growth-os/api && npm run build -w @ai-growth-os/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "wp:up": "docker compose -f docker-compose.wordpress.yml up -d",
+    "wp:down": "docker compose -f docker-compose.wordpress.yml down",
+    "plugin:zip": "bash scripts/plugin-zip.sh"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: growthos-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: growthos
+      POSTGRES_PASSWORD: growthos
+      POSTGRES_DB: growthos
+    ports:
+      # Host 5433 avoids clash with local Postgres on 5432
+      - "5433:5432"
+    volumes:
+      - growthos_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U growthos -d growthos"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: growthos-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - growthos_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  growthos_pg:
+  growthos_redis:
