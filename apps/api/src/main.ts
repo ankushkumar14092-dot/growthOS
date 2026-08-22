@@ -7,10 +7,32 @@ async function bootstrap() {
   await initSentry();
   const app = await NestFactory.create(AppModule, { rawBody: true });
   const rawOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
-  const origin = rawOrigin.includes(",")
+  const configured = rawOrigin.includes(",")
     ? rawOrigin.split(",").map((o) => o.trim()).filter(Boolean)
-    : rawOrigin;
-  app.enableCors({ origin, credentials: true });
+    : [rawOrigin.trim()].filter(Boolean);
+  const allowLanInDev = process.env.NODE_ENV !== "production";
+  const isPrivateLan = (origin: string) =>
+    /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/i.test(
+      origin,
+    );
+
+  app.enableCors({
+    origin: (
+      requestOrigin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      if (!requestOrigin) {
+        callback(null, true);
+        return;
+      }
+      if (configured.includes(requestOrigin) || (allowLanInDev && isPrivateLan(requestOrigin))) {
+        callback(null, true);
+        return;
+      }
+      callback(null, false);
+    },
+    credentials: true,
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

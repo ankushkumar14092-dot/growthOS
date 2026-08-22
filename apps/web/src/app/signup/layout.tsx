@@ -16,10 +16,43 @@ export const metadata: Metadata = {
   },
 };
 
+const FAQ = [
+  {
+    q: "What is AI-Growth-OS?",
+    a: "AI-Growth-OS is an AI growth engine for websites: connect a site, scan SEO/AEO/GEO issues, approve proposals, then deploy and verify.",
+  },
+  {
+    q: "Does the Vercel app use AI?",
+    a: "Optional LLM polish is available with an OpenAI key. Scans and many proposals work without it using rules-based engines.",
+  },
+  {
+    q: "Is signup free?",
+    a: "Yes — start on the Free plan, then upgrade to Starter or Agency via Razorpay when you need higher limits.",
+  },
+];
+
 export default function SignupLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      {children}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: FAQ.map((item) => ({
+              "@type": "Question",
+              name: item.q,
+              acceptedAnswer: { "@type": "Answer", text: item.a },
+            })),
+          }),
+        }}
+      />
+    </>
+  );
 }

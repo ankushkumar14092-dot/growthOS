@@ -16,10 +16,43 @@ export const metadata: Metadata = {
   },
 };
 
+const FAQ = [
+  {
+    q: "What is AI-Growth-OS?",
+    a: "AI-Growth-OS helps teams improve SEO, AEO, and GEO (AI-visibility) by scanning a site, proposing safe fixes, and deploying with verify and rollback where supported.",
+  },
+  {
+    q: "Does the Vercel app use AI?",
+    a: "Yes for optional copy polish when an OpenAI key is set. Core proposals also work with deterministic rules without an LLM key.",
+  },
+  {
+    q: "How do I sign in?",
+    a: "Use the email and password from signup. After login you land in Mission Control to connect sites and run scans.",
+  },
+];
+
 export default function LoginLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      {children}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: FAQ.map((item) => ({
+              "@type": "Question",
+              name: item.q,
+              acceptedAnswer: { "@type": "Answer", text: item.a },
+            })),
+          }),
+        }}
+      />
+    </>
+  );
 }

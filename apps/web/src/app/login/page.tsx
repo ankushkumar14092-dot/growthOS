@@ -67,6 +67,23 @@ export default function LoginPage() {
             <a href="/">Home</a>
           </p>
         </form>
+        <section style={faqBox} aria-label="FAQ">
+          <h2 style={faqTitle}>FAQ</h2>
+          <details>
+            <summary>What is AI-Growth-OS?</summary>
+            <p style={faqBody}>
+              Scan sites for SEO · AEO · GEO issues, approve safe fixes, then
+              deploy with verify and rollback where supported.
+            </p>
+          </details>
+          <details>
+            <summary>Does the Vercel app use AI?</summary>
+            <p style={faqBody}>
+              Optional OpenAI polish when configured; core proposals also work
+              with deterministic rules.
+            </p>
+          </details>
+        </section>
       </div>
     </main>
   );
@@ -151,4 +168,28 @@ const errorStyle: React.CSSProperties = {
   margin: 0,
   color: "var(--color-error)",
   fontSize: 14,
+};
+
+const faqBox: React.CSSProperties = {
+  padding: 16,
+  borderRadius: 12,
+  border: "1px solid var(--color-border)",
+  background: "var(--color-surface)",
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+};
+
+const faqTitle: React.CSSProperties = {
+  margin: 0,
+  fontSize: 14,
+  fontWeight: 600,
+  color: "var(--color-navy)",
+};
+
+const faqBody: React.CSSProperties = {
+  margin: "6px 0 0",
+  fontSize: 13,
+  color: "var(--color-text-muted)",
+  lineHeight: 1.45,
 };

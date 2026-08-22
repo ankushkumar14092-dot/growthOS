@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+import { getApiUrl } from "./api-url";
+
+const API_URL = () => getApiUrl();
 
 export type AuthResponse = {
   accessToken: string;
@@ -55,7 +57,7 @@ export async function apiSignup(body: {
   password: string;
   name: string;
 }) {
-  const res = await fetch(`${API_URL}/auth/signup`, {
+  const res = await fetch(`${API_URL()}/auth/signup`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(body),
@@ -65,7 +67,7 @@ export async function apiSignup(body: {
 }
 
 export async function apiLogin(body: { email: string; password: string }) {
-  const res = await fetch(`${API_URL}/auth/login`, {
+  const res = await fetch(`${API_URL()}/auth/login`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(body),
@@ -75,7 +77,7 @@ export async function apiLogin(body: { email: string; password: string }) {
 }
 
 export async function apiMe(token: string) {
-  const res = await fetch(`${API_URL}/auth/me`, {
+  const res = await fetch(`${API_URL()}/auth/me`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -87,7 +89,7 @@ export async function apiCreateOrg(
   token: string,
   body: { name: string; plan?: string },
 ) {
-  const res = await fetch(`${API_URL}/organizations`, {
+  const res = await fetch(`${API_URL()}/organizations`, {
     method: "POST",
     headers: authHeaders(token),
     body: JSON.stringify(body),
@@ -97,7 +99,7 @@ export async function apiCreateOrg(
 }
 
 export async function apiListOrgs(token: string) {
-  const res = await fetch(`${API_URL}/organizations`, {
+  const res = await fetch(`${API_URL()}/organizations`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -106,7 +108,7 @@ export async function apiListOrgs(token: string) {
 }
 
 export async function apiConnectionTypes(token: string) {
-  const res = await fetch(`${API_URL}/sites/connection-types`, {
+  const res = await fetch(`${API_URL()}/sites/connection-types`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -116,7 +118,7 @@ export async function apiConnectionTypes(token: string) {
 
 export async function apiListSites(token: string, organizationId: string) {
   const res = await fetch(
-    `${API_URL}/sites?organizationId=${encodeURIComponent(organizationId)}`,
+    `${API_URL()}/sites?organizationId=${encodeURIComponent(organizationId)}`,
     { headers: authHeaders(token), cache: "no-store" },
   );
   if (!res.ok) throw new Error(await res.text());
@@ -124,7 +126,7 @@ export async function apiListSites(token: string, organizationId: string) {
 }
 
 export async function apiGetSite(token: string, siteId: string) {
-  const res = await fetch(`${API_URL}/sites/${siteId}`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -142,7 +144,7 @@ export async function apiCreateSite(
     repo?: string;
   },
 ) {
-  const res = await fetch(`${API_URL}/sites`, {
+  const res = await fetch(`${API_URL()}/sites`, {
     method: "POST",
     headers: authHeaders(token),
     body: JSON.stringify(body),
@@ -152,7 +154,7 @@ export async function apiCreateSite(
 }
 
 export async function apiDeleteSite(token: string, siteId: string) {
-  const res = await fetch(`${API_URL}/sites/${siteId}`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}`, {
     method: "DELETE",
     headers: authHeaders(token),
   });
@@ -165,7 +167,7 @@ export async function apiConnectSite(
   siteId: string,
   body: Record<string, unknown>,
 ) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/connect`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/connect`, {
     method: "POST",
     headers: authHeaders(token),
     body: JSON.stringify(body),
@@ -184,7 +186,7 @@ export async function apiUploadZip(
 ) {
   const fd = new FormData();
   fd.append("file", file);
-  const res = await fetch(`${API_URL}/sites/${siteId}/upload`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/upload`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: fd,
@@ -198,7 +200,7 @@ export async function apiUploadZip(
 }
 
 export async function apiSiteHealth(token: string, siteId: string) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/health`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/health`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -223,7 +225,7 @@ export type JobRunDto = {
 };
 
 export async function apiStartAudit(token: string, siteId: string) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/audits`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/audits`, {
     method: "POST",
     headers: authHeaders(token),
   });
@@ -232,7 +234,7 @@ export async function apiStartAudit(token: string, siteId: string) {
 }
 
 export async function apiGetJobRun(token: string, jobRunId: string) {
-  const res = await fetch(`${API_URL}/job-runs/${jobRunId}`, {
+  const res = await fetch(`${API_URL()}/job-runs/${jobRunId}`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -241,7 +243,7 @@ export async function apiGetJobRun(token: string, jobRunId: string) {
 }
 
 export async function apiListJobRuns(token: string, siteId: string) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/job-runs`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/job-runs`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -266,7 +268,7 @@ export async function apiListIssues(
   jobRunId?: string,
 ) {
   const q = jobRunId ? `?jobRunId=${encodeURIComponent(jobRunId)}` : "";
-  const res = await fetch(`${API_URL}/sites/${siteId}/issues${q}`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/issues${q}`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -303,7 +305,7 @@ export async function apiListProposals(
   jobRunId?: string,
 ) {
   const q = jobRunId ? `?jobRunId=${encodeURIComponent(jobRunId)}` : "";
-  const res = await fetch(`${API_URL}/sites/${siteId}/proposals${q}`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/proposals${q}`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -312,7 +314,7 @@ export async function apiListProposals(
 }
 
 export async function apiApproveProposal(token: string, proposalId: string) {
-  const res = await fetch(`${API_URL}/proposals/${proposalId}/approve`, {
+  const res = await fetch(`${API_URL()}/proposals/${proposalId}/approve`, {
     method: "POST",
     headers: authHeaders(token),
   });
@@ -321,7 +323,7 @@ export async function apiApproveProposal(token: string, proposalId: string) {
 }
 
 export async function apiRejectProposal(token: string, proposalId: string) {
-  const res = await fetch(`${API_URL}/proposals/${proposalId}/reject`, {
+  const res = await fetch(`${API_URL()}/proposals/${proposalId}/reject`, {
     method: "POST",
     headers: authHeaders(token),
   });
@@ -387,7 +389,7 @@ export async function apiDeploySite(
   siteId: string,
   body?: { patchIds?: string[] },
 ) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/deploy`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/deploy`, {
     method: "POST",
     headers: authHeaders(token),
     body: JSON.stringify(body ?? {}),
@@ -397,7 +399,7 @@ export async function apiDeploySite(
 }
 
 export async function apiListDeployments(token: string, siteId: string) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/deployments`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/deployments`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -406,7 +408,7 @@ export async function apiListDeployments(token: string, siteId: string) {
 }
 
 export async function apiGetDeployment(token: string, deploymentId: string) {
-  const res = await fetch(`${API_URL}/deployments/${deploymentId}`, {
+  const res = await fetch(`${API_URL()}/deployments/${deploymentId}`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -418,7 +420,7 @@ export async function apiRollbackDeployment(
   token: string,
   deploymentId: string,
 ) {
-  const res = await fetch(`${API_URL}/deployments/${deploymentId}/rollback`, {
+  const res = await fetch(`${API_URL()}/deployments/${deploymentId}/rollback`, {
     method: "POST",
     headers: authHeaders(token),
   });
@@ -500,7 +502,7 @@ export type SearchHit = {
 
 export async function apiMissionControl(token: string, orgId: string) {
   const res = await fetch(
-    `${API_URL}/organizations/${orgId}/mission-control`,
+    `${API_URL()}/organizations/${orgId}/mission-control`,
     { headers: authHeaders(token), cache: "no-store" },
   );
   if (!res.ok) throw new Error(await res.text());
@@ -509,7 +511,7 @@ export async function apiMissionControl(token: string, orgId: string) {
 
 export async function apiSearch(token: string, orgId: string, q: string) {
   const res = await fetch(
-    `${API_URL}/organizations/${orgId}/search?q=${encodeURIComponent(q)}`,
+    `${API_URL()}/organizations/${orgId}/search?q=${encodeURIComponent(q)}`,
     { headers: authHeaders(token), cache: "no-store" },
   );
   if (!res.ok) throw new Error(await res.text());
@@ -553,7 +555,7 @@ export type PilotMetricsDto = {
 };
 
 export async function apiBilling(token: string, orgId: string) {
-  const res = await fetch(`${API_URL}/organizations/${orgId}/billing`, {
+  const res = await fetch(`${API_URL()}/organizations/${orgId}/billing`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -566,7 +568,7 @@ export async function apiBillingCheckout(
   orgId: string,
   plan: "starter" | "agency",
 ) {
-  const res = await fetch(`${API_URL}/organizations/${orgId}/billing/checkout`, {
+  const res = await fetch(`${API_URL()}/organizations/${orgId}/billing/checkout`, {
     method: "POST",
     headers: authHeaders(token),
     body: JSON.stringify({ plan }),
@@ -576,7 +578,7 @@ export async function apiBillingCheckout(
 }
 
 export async function apiBillingPortal(token: string, orgId: string) {
-  const res = await fetch(`${API_URL}/organizations/${orgId}/billing/portal`, {
+  const res = await fetch(`${API_URL()}/organizations/${orgId}/billing/portal`, {
     method: "POST",
     headers: authHeaders(token),
   });
@@ -585,7 +587,7 @@ export async function apiBillingPortal(token: string, orgId: string) {
 }
 
 export async function apiPilotMetrics(token: string, orgId: string) {
-  const res = await fetch(`${API_URL}/organizations/${orgId}/pilot-metrics`, {
+  const res = await fetch(`${API_URL()}/organizations/${orgId}/pilot-metrics`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -598,7 +600,7 @@ export async function apiPatchSiteSettings(
   siteId: string,
   body: { schedule?: "weekly" | "manual"; safe_auto_apply?: boolean; base_url?: string },
 ) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/settings`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/settings`, {
     method: "PATCH",
     headers: authHeaders(token),
     body: JSON.stringify(body),
@@ -626,7 +628,7 @@ export type SiteResearchDto = {
 };
 
 export async function apiResearchStatus(token: string) {
-  const res = await fetch(`${API_URL}/research/status`, {
+  const res = await fetch(`${API_URL()}/research/status`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -639,7 +641,7 @@ export async function apiResearchStatus(token: string) {
 }
 
 export async function apiGetSiteResearch(token: string, siteId: string) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/research`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/research`, {
     headers: authHeaders(token),
     cache: "no-store",
   });
@@ -655,7 +657,7 @@ export async function apiRunSiteResearch(
   siteId: string,
   query?: string,
 ) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/research`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/research`, {
     method: "POST",
     headers: authHeaders(token),
     body: JSON.stringify(query ? { query } : {}),
@@ -679,7 +681,7 @@ export async function apiApplySiteResearch(
   siteId: string,
   opts?: { approve?: boolean },
 ) {
-  const res = await fetch(`${API_URL}/sites/${siteId}/research/apply`, {
+  const res = await fetch(`${API_URL()}/sites/${siteId}/research/apply`, {
     method: "POST",
     headers: authHeaders(token),
     body: JSON.stringify({ approve: opts?.approve !== false }),

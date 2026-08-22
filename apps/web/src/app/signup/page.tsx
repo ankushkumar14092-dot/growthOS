@@ -76,6 +76,23 @@ export default function SignupPage() {
             <a href="/">Home</a>
           </p>
         </form>
+        <section style={faqBox} aria-label="FAQ">
+          <h2 style={faqTitle}>FAQ</h2>
+          <details>
+            <summary>Is signup free?</summary>
+            <p style={faqBody}>
+              Yes — Free plan to start. Upgrade later via Razorpay for higher
+              site and scan limits.
+            </p>
+          </details>
+          <details>
+            <summary>Does the Vercel app use AI?</summary>
+            <p style={faqBody}>
+              Optional LLM polish with an OpenAI key; scans and many proposals
+              work without it.
+            </p>
+          </details>
+        </section>
       </div>
     </main>
   );
@@ -160,4 +177,28 @@ const errorStyle: React.CSSProperties = {
   margin: 0,
   color: "var(--color-error)",
   fontSize: 14,
+};
+
+const faqBox: React.CSSProperties = {
+  padding: 16,
+  borderRadius: 12,
+  border: "1px solid var(--color-border)",
+  background: "var(--color-surface)",
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+};
+
+const faqTitle: React.CSSProperties = {
+  margin: 0,
+  fontSize: 14,
+  fontWeight: 600,
+  color: "var(--color-navy)",
+};
+
+const faqBody: React.CSSProperties = {
+  margin: "6px 0 0",
+  fontSize: 13,
+  color: "var(--color-text-muted)",
+  lineHeight: 1.45,
 };

@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+import { getApiUrl } from "./api-url";
+
 const ANON_KEY = "aigos_anon";
 
 /** Works on HTTP LAN IPs where crypto.randomUUID is missing (non-secure context). */
@@ -42,7 +43,7 @@ export function trackEvent(
     userId: opts?.userId,
     props: props ?? {},
   };
-  void fetch(`${API_URL}/analytics/events`, {
+  void fetch(`${getApiUrl()}/analytics/events`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -56,7 +57,7 @@ export async function joinWaitlist(input: {
   company?: string;
   role?: string;
 }) {
-  const res = await fetch(`${API_URL}/waitlist`, {
+  const res = await fetch(`${getApiUrl()}/waitlist`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
