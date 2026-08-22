@@ -1,11 +1,28 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 const ANON_KEY = "aigos_anon";
 
+/** Works on HTTP LAN IPs where crypto.randomUUID is missing (non-secure context). */
+function createId(): string {
+  const c = globalThis.crypto as Crypto | undefined;
+  if (c && typeof c.randomUUID === "function") {
+    return c.randomUUID();
+  }
+  if (c && typeof c.getRandomValues === "function") {
+    const bytes = new Uint8Array(16);
+    c.getRandomValues(bytes);
+    bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+    bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+    const hex = [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  return `anon-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 export function getAnonymousId(): string {
   if (typeof window === "undefined") return "ssr";
   let id = localStorage.getItem(ANON_KEY);
   if (!id) {
-    id = crypto.randomUUID();
+    id = createId();
     localStorage.setItem(ANON_KEY, id);
   }
   return id;

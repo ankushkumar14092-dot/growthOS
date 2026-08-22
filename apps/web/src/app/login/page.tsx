@@ -35,25 +35,39 @@ export default function LoginPage() {
 
   return (
     <main style={pageStyle}>
-      <form onSubmit={onSubmit} style={cardStyle}>
-        <h1 style={titleStyle}>Login</h1>
-        <p style={mutedStyle}>Welcome back to AI-Growth-OS</p>
-        <label style={labelStyle}>
-          Email
-          <input name="email" type="email" required style={inputStyle} />
-        </label>
-        <label style={labelStyle}>
-          Password
-          <input name="password" type="password" required style={inputStyle} />
-        </label>
-        {error ? <p style={errorStyle}>{error}</p> : null}
-        <button type="submit" disabled={loading} style={primaryBtn}>
-          {loading ? "Signing in…" : "Login"}
-        </button>
-        <p style={{ ...mutedStyle, marginTop: 16 }}>
-          New here? <a href="/signup">Create account</a>
+      <div style={wrapStyle}>
+        <p style={brandStyle}>
+          <a href="/" style={{ color: "inherit", textDecoration: "none" }}>
+            AI-Growth-OS
+          </a>
         </p>
-      </form>
+        <form onSubmit={onSubmit} style={cardStyle}>
+          <h1 style={titleStyle}>Login</h1>
+          <p style={mutedStyle}>
+            Welcome back. Open Mission Control to scan sites for SEO, AEO, and
+            GEO (AI-visibility), then approve safe fixes before deploy.
+          </p>
+          <label style={labelStyle}>
+            Email
+            <input name="email" type="email" required style={inputStyle} />
+          </label>
+          <label style={labelStyle}>
+            Password
+            <input name="password" type="password" required style={inputStyle} />
+          </label>
+          {error ? <p style={errorStyle}>{error}</p> : null}
+          <button type="submit" disabled={loading} style={primaryBtn}>
+            {loading ? "Signing in…" : "Login"}
+          </button>
+          <p style={{ ...mutedStyle, marginTop: 16 }}>
+            New here? <a href="/signup">Create account</a>
+            {" · "}
+            <a href="/#how">How it works</a>
+            {" · "}
+            <a href="/">Home</a>
+          </p>
+        </form>
+      </div>
     </main>
   );
 }
@@ -66,9 +80,24 @@ const pageStyle: React.CSSProperties = {
   background: "var(--color-bg)",
 };
 
-const cardStyle: React.CSSProperties = {
+const wrapStyle: React.CSSProperties = {
   width: "100%",
   maxWidth: 420,
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+};
+
+const brandStyle: React.CSSProperties = {
+  margin: 0,
+  fontWeight: 700,
+  letterSpacing: "-0.03em",
+  fontSize: 15,
+  color: "var(--color-navy)",
+};
+
+const cardStyle: React.CSSProperties = {
+  width: "100%",
   padding: 24,
   borderRadius: 12,
   background: "var(--color-surface)",
@@ -89,6 +118,7 @@ const mutedStyle: React.CSSProperties = {
   margin: 0,
   fontSize: 14,
   color: "var(--color-text-muted)",
+  lineHeight: 1.5,
 };
 
 const labelStyle: React.CSSProperties = {

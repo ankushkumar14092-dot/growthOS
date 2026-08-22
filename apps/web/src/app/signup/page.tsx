@@ -33,35 +33,50 @@ export default function SignupPage() {
 
   return (
     <main style={pageStyle}>
-      <form onSubmit={onSubmit} style={cardStyle}>
-        <h1 style={titleStyle}>Create account</h1>
-        <p style={mutedStyle}>Start your AI-Growth-OS workspace</p>
-        <label style={labelStyle}>
-          Name
-          <input name="name" required style={inputStyle} />
-        </label>
-        <label style={labelStyle}>
-          Email
-          <input name="email" type="email" required style={inputStyle} />
-        </label>
-        <label style={labelStyle}>
-          Password (min 8)
-          <input
-            name="password"
-            type="password"
-            minLength={8}
-            required
-            style={inputStyle}
-          />
-        </label>
-        {error ? <p style={errorStyle}>{error}</p> : null}
-        <button type="submit" disabled={loading} style={primaryBtn}>
-          {loading ? "Creating…" : "Sign up"}
-        </button>
-        <p style={{ ...mutedStyle, marginTop: 16 }}>
-          Already have an account? <a href="/login">Login</a>
+      <div style={wrapStyle}>
+        <p style={brandStyle}>
+          <a href="/" style={{ color: "inherit", textDecoration: "none" }}>
+            AI-Growth-OS
+          </a>
         </p>
-      </form>
+        <form onSubmit={onSubmit} style={cardStyle}>
+          <h1 style={titleStyle}>Create account</h1>
+          <p style={mutedStyle}>
+            Start a workspace to connect WordPress, GitHub, or a live URL. Scan
+            for SEO · AEO · GEO gaps, approve AI proposals, then deploy with
+            verify and rollback where supported.
+          </p>
+          <label style={labelStyle}>
+            Name
+            <input name="name" required style={inputStyle} />
+          </label>
+          <label style={labelStyle}>
+            Email
+            <input name="email" type="email" required style={inputStyle} />
+          </label>
+          <label style={labelStyle}>
+            Password (min 8)
+            <input
+              name="password"
+              type="password"
+              minLength={8}
+              required
+              style={inputStyle}
+            />
+          </label>
+          {error ? <p style={errorStyle}>{error}</p> : null}
+          <button type="submit" disabled={loading} style={primaryBtn}>
+            {loading ? "Creating…" : "Sign up"}
+          </button>
+          <p style={{ ...mutedStyle, marginTop: 16 }}>
+            Already have an account? <a href="/login">Login</a>
+            {" · "}
+            <a href="/#trust">Trust model</a>
+            {" · "}
+            <a href="/">Home</a>
+          </p>
+        </form>
+      </div>
     </main>
   );
 }
@@ -74,9 +89,24 @@ const pageStyle: React.CSSProperties = {
   background: "var(--color-bg)",
 };
 
-const cardStyle: React.CSSProperties = {
+const wrapStyle: React.CSSProperties = {
   width: "100%",
   maxWidth: 420,
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+};
+
+const brandStyle: React.CSSProperties = {
+  margin: 0,
+  fontWeight: 700,
+  letterSpacing: "-0.03em",
+  fontSize: 15,
+  color: "var(--color-navy)",
+};
+
+const cardStyle: React.CSSProperties = {
+  width: "100%",
   padding: 24,
   borderRadius: 12,
   background: "var(--color-surface)",
@@ -97,6 +127,7 @@ const mutedStyle: React.CSSProperties = {
   margin: 0,
   fontSize: 14,
   color: "var(--color-text-muted)",
+  lineHeight: 1.5,
 };
 
 const labelStyle: React.CSSProperties = {

@@ -521,7 +521,7 @@ export type BillingSummaryDto = {
   plan: string;
   planLabel: string;
   priceLabel: string;
-  stripeConfigured: boolean;
+  razorpayConfigured: boolean;
   limits: { sites: number; scansPerMonth: number; label: string; priceLabel: string };
   usage: {
     sites: number;
@@ -532,7 +532,7 @@ export type BillingSummaryDto = {
   subscription: {
     id: string;
     active: boolean;
-    stripeSubscriptionId: string | null;
+    razorpaySubscriptionId: string | null;
   };
 };
 

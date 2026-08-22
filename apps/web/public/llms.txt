@@ -1,0 +1,12 @@
+# AI-Growth-OS
+
+> AI-Growth-OS helps teams improve SEO, AEO, and GEO (AI-visibility) by connecting a site, scanning issues, approving safe fixes, and deploying with verify/rollback.
+
+## Preferred pages
+- Homepage: https://grothos.vercel.app/
+- Signup: https://grothos.vercel.app/signup
+- Login: https://grothos.vercel.app/login
+
+## Optional
+- Sitemap: https://grothos.vercel.app/sitemap.xml
+- Robots: https://grothos.vercel.app/robots.txt

@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MembershipRole, PlanTier } from "@prisma/client";
+import { createHmac, timingSafeEqual } from "crypto";
 import { PrismaService } from "../prisma/prisma.service";
 import { UsageService } from "./usage.service";
 
@@ -14,9 +15,9 @@ const PLAN_LIMITS: Record<
   PlanTier,
   { sites: number; scansPerMonth: number; label: string; priceLabel: string }
 > = {
-  free: { sites: 2, scansPerMonth: 20, label: "Free", priceLabel: "$0" },
-  starter: { sites: 10, scansPerMonth: 200, label: "Starter", priceLabel: "$49/mo" },
-  agency: { sites: 50, scansPerMonth: 2000, label: "Agency", priceLabel: "$199/mo" },
+  free: { sites: 2, scansPerMonth: 20, label: "Free", priceLabel: "₹0" },
+  starter: { sites: 10, scansPerMonth: 200, label: "Starter", priceLabel: "₹3,999/mo" },
+  agency: { sites: 50, scansPerMonth: 2000, label: "Agency", priceLabel: "₹15,999/mo" },
 };
 
 @Injectable()
@@ -56,18 +57,21 @@ export class BillingService {
     });
     const plan = sub.plan;
     const limits = PLAN_LIMITS[plan];
+    const razorpayConfigured = Boolean(
+      this.config.get("RAZORPAY_KEY_ID") && this.config.get("RAZORPAY_KEY_SECRET"),
+    );
 
     return {
       organizationId,
       plan,
       planLabel: limits.label,
       priceLabel: limits.priceLabel,
-      stripeConfigured: Boolean(this.config.get("STRIPE_SECRET_KEY")),
-      stripeCustomerId: org.stripeCustomerId,
+      razorpayConfigured,
+      razorpayCustomerId: org.razorpayCustomerId,
       subscription: {
         id: sub.id,
         active: sub.active,
-        stripeSubscriptionId: sub.stripeSubscriptionId,
+        razorpaySubscriptionId: sub.razorpaySubscriptionId,
         periodStart: sub.periodStart,
         periodEnd: sub.periodEnd,
       },
@@ -95,51 +99,70 @@ export class BillingService {
     });
     if (!org) throw new NotFoundException("org_not_found");
 
-    const secret = this.config.get<string>("STRIPE_SECRET_KEY");
-    const priceStarter = this.config.get<string>("STRIPE_PRICE_STARTER");
-    const priceAgency = this.config.get<string>("STRIPE_PRICE_AGENCY");
-    const webOrigin = this.config.get<string>("CORS_ORIGIN") ?? "http://localhost:3000";
+    const keyId = this.config.get<string>("RAZORPAY_KEY_ID");
+    const keySecret = this.config.get<string>("RAZORPAY_KEY_SECRET");
+    const planStarter = this.config.get<string>("RAZORPAY_PLAN_STARTER");
+    const planAgency = this.config.get<string>("RAZORPAY_PLAN_AGENCY");
+    const webOrigin = firstWebOrigin(
+      this.config.get<string>("CORS_ORIGIN") ?? "http://localhost:3000",
+    );
 
-    if (!secret) {
-      // Stub: activate plan locally without Stripe
+    if (!keyId || !keySecret) {
       await this.activatePlan(organizationId, plan, {
-        stripeSubscriptionId: `stub_sub_${plan}_${Date.now()}`,
+        razorpaySubscriptionId: `stub_sub_${plan}_${Date.now()}`,
       });
       return {
         mode: "stub" as const,
         url: `${webOrigin}/dashboard?billing=stub_activated&plan=${plan}`,
-        message: "Stripe not configured — plan activated in stub mode",
+        message: "Razorpay not configured — plan activated in stub mode",
       };
     }
 
-    const priceId = plan === "agency" ? priceAgency : priceStarter;
-    if (!priceId) {
-      throw new BadRequestException("stripe_price_not_configured");
+    const razorpayPlanId = plan === "agency" ? planAgency : planStarter;
+    if (!razorpayPlanId) {
+      throw new BadRequestException("razorpay_plan_not_configured");
     }
 
-    let customerId = org.stripeCustomerId;
+    let customerId = org.razorpayCustomerId;
     if (!customerId) {
-      customerId = await this.stripeCreateCustomer(secret, org.name, organizationId);
+      customerId = await this.razorpayCreateCustomer(
+        keyId,
+        keySecret,
+        org.name,
+        organizationId,
+      );
       await this.prisma.organization.update({
         where: { id: organizationId },
-        data: { stripeCustomerId: customerId },
+        data: { razorpayCustomerId: customerId },
       });
     }
 
-    const session = await this.stripeRequest(secret, "POST", "/v1/checkout/sessions", {
-      mode: "subscription",
-      customer: customerId,
-      success_url: `${webOrigin}/dashboard?billing=success`,
-      cancel_url: `${webOrigin}/dashboard?billing=cancel`,
-      line_items: [{ price: priceId, quantity: "1" }],
-      client_reference_id: organizationId,
-      metadata: { organizationId, plan },
-    });
+    const subscription = await this.razorpayRequest(
+      keyId,
+      keySecret,
+      "POST",
+      "/v1/subscriptions",
+      {
+        plan_id: razorpayPlanId,
+        customer_id: customerId,
+        total_count: 120,
+        customer_notify: 1,
+        notes: {
+          organizationId,
+          plan,
+        },
+      },
+    );
+
+    const shortUrl = subscription.short_url
+      ? String(subscription.short_url)
+      : `${webOrigin}/dashboard?billing=awaiting_payment&sub=${String(subscription.id)}`;
 
     return {
-      mode: "stripe" as const,
-      url: String(session.url),
-      sessionId: String(session.id),
+      mode: "razorpay" as const,
+      url: shortUrl,
+      subscriptionId: String(subscription.id),
+      keyId,
     };
   }
 
@@ -150,57 +173,113 @@ export class BillingService {
     });
     if (!org) throw new NotFoundException("org_not_found");
 
-    const secret = this.config.get<string>("STRIPE_SECRET_KEY");
-    const webOrigin = this.config.get<string>("CORS_ORIGIN") ?? "http://localhost:3000";
+    const keyId = this.config.get<string>("RAZORPAY_KEY_ID");
+    const keySecret = this.config.get<string>("RAZORPAY_KEY_SECRET");
+    const webOrigin = firstWebOrigin(
+      this.config.get<string>("CORS_ORIGIN") ?? "http://localhost:3000",
+    );
 
-    if (!secret || !org.stripeCustomerId) {
+    const active = await this.prisma.subscription.findFirst({
+      where: { organizationId, active: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (
+      !keyId ||
+      !keySecret ||
+      !active?.razorpaySubscriptionId ||
+      active.razorpaySubscriptionId.startsWith("stub_")
+    ) {
       return {
         mode: "stub" as const,
         url: `${webOrigin}/dashboard#billing`,
-        message: "Stripe portal unavailable in stub mode — manage plan via checkout stub",
+        message: "Razorpay portal unavailable in stub mode — manage plan via checkout",
       };
     }
 
-    const session = await this.stripeRequest(secret, "POST", "/v1/billing_portal/sessions", {
-      customer: org.stripeCustomerId,
-      return_url: `${webOrigin}/dashboard#billing`,
-    });
+    // Cancel at period end via Razorpay, then send user back to billing.
+    try {
+      await this.razorpayRequest(
+        keyId,
+        keySecret,
+        "POST",
+        `/v1/subscriptions/${active.razorpaySubscriptionId}/cancel`,
+        { cancel_at_cycle_end: 1 },
+      );
+    } catch (err) {
+      this.logger.warn(
+        `razorpay cancel failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
 
-    return { mode: "stripe" as const, url: String(session.url) };
+    return {
+      mode: "razorpay" as const,
+      url: `${webOrigin}/dashboard?billing=cancel_requested#billing`,
+      message: "Cancellation requested at cycle end",
+    };
   }
 
   async handleWebhook(rawBody: Buffer, signature: string | undefined) {
-    const secret = this.config.get<string>("STRIPE_WEBHOOK_SECRET");
+    const secret = this.config.get<string>("RAZORPAY_WEBHOOK_SECRET");
     if (!secret) {
-      this.logger.warn("STRIPE_WEBHOOK_SECRET missing — accepting stub webhook");
-    } else if (!signature) {
-      throw new BadRequestException("missing_stripe_signature");
-    }
-    // Signature verification requires stripe SDK; for stub we parse JSON only.
-    const event = JSON.parse(rawBody.toString("utf8")) as {
-      type?: string;
-      data?: { object?: Record<string, unknown> };
-    };
-
-    const type = event.type ?? "";
-    const obj = event.data?.object ?? {};
-
-    if (type === "checkout.session.completed") {
-      const orgId = String(obj.client_reference_id ?? obj.metadata && (obj.metadata as { organizationId?: string }).organizationId ?? "");
-      const plan = ((obj.metadata as { plan?: string } | undefined)?.plan ?? "starter") as PlanTier;
-      const subId = typeof obj.subscription === "string" ? obj.subscription : undefined;
-      if (orgId) {
-        await this.activatePlan(orgId, plan === "agency" ? "agency" : "starter", {
-          stripeSubscriptionId: subId,
-        });
+      this.logger.warn("RAZORPAY_WEBHOOK_SECRET missing — accepting stub webhook");
+    } else {
+      if (!signature) throw new BadRequestException("missing_razorpay_signature");
+      const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
+      const a = Buffer.from(expected);
+      const b = Buffer.from(signature);
+      if (a.length !== b.length || !timingSafeEqual(a, b)) {
+        throw new BadRequestException("invalid_razorpay_signature");
       }
     }
 
-    if (type === "customer.subscription.deleted") {
-      const customerId = String(obj.customer ?? "");
-      const org = await this.prisma.organization.findFirst({
-        where: { stripeCustomerId: customerId, deletedAt: null },
-      });
+    const event = JSON.parse(rawBody.toString("utf8")) as {
+      event?: string;
+      payload?: {
+        subscription?: { entity?: Record<string, unknown> };
+        payment?: { entity?: Record<string, unknown> };
+      };
+    };
+
+    const type = event.event ?? "";
+    const subEntity = event.payload?.subscription?.entity ?? {};
+    const payEntity = event.payload?.payment?.entity ?? {};
+    const notes =
+      (subEntity.notes as { organizationId?: string; plan?: string } | undefined) ??
+      (payEntity.notes as { organizationId?: string; plan?: string } | undefined) ??
+      {};
+
+    if (
+      type === "subscription.activated" ||
+      type === "subscription.charged" ||
+      type === "subscription.authenticated"
+    ) {
+      const orgId = String(notes.organizationId ?? "");
+      const plan = (notes.plan === "agency" ? "agency" : "starter") as PlanTier;
+      const subId = typeof subEntity.id === "string" ? subEntity.id : undefined;
+      if (orgId) {
+        await this.activatePlan(orgId, plan, { razorpaySubscriptionId: subId });
+      }
+    }
+
+    if (
+      type === "subscription.cancelled" ||
+      type === "subscription.completed" ||
+      type === "subscription.halted"
+    ) {
+      const orgId = String(notes.organizationId ?? "");
+      const customerId = String(subEntity.customer_id ?? "");
+      let org =
+        orgId
+          ? await this.prisma.organization.findFirst({
+              where: { id: orgId, deletedAt: null },
+            })
+          : null;
+      if (!org && customerId) {
+        org = await this.prisma.organization.findFirst({
+          where: { razorpayCustomerId: customerId, deletedAt: null },
+        });
+      }
       if (org) {
         await this.activatePlan(org.id, "free", {});
       }
@@ -212,7 +291,7 @@ export class BillingService {
   private async activatePlan(
     organizationId: string,
     plan: PlanTier,
-    opts: { stripeSubscriptionId?: string },
+    opts: { razorpaySubscriptionId?: string; razorpayPlanId?: string },
   ) {
     await this.prisma.organization.update({
       where: { id: organizationId },
@@ -230,42 +309,49 @@ export class BillingService {
         organizationId,
         plan,
         active: true,
-        stripeSubscriptionId: opts.stripeSubscriptionId,
+        razorpaySubscriptionId: opts.razorpaySubscriptionId,
+        razorpayPlanId: opts.razorpayPlanId,
         periodStart: now,
         periodEnd: end,
       },
     });
   }
 
-  private async stripeCreateCustomer(secret: string, name: string, organizationId: string) {
-    const res = await this.stripeRequest(secret, "POST", "/v1/customers", {
-      name,
-      metadata: { organizationId },
+  private async razorpayCreateCustomer(
+    keyId: string,
+    keySecret: string,
+    name: string,
+    organizationId: string,
+  ) {
+    const res = await this.razorpayRequest(keyId, keySecret, "POST", "/v1/customers", {
+      name: name.slice(0, 50),
+      notes: { organizationId },
+      fail_existing: "0",
     });
     return String(res.id);
   }
 
-  private async stripeRequest(
-    secret: string,
+  private async razorpayRequest(
+    keyId: string,
+    keySecret: string,
     method: "POST",
     path: string,
     body: Record<string, unknown>,
   ) {
-    const params = new URLSearchParams();
-    flattenStripe(body, params);
-    const res = await fetch(`https://api.stripe.com${path}`, {
+    const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
+    const res = await fetch(`https://api.razorpay.com${path}`, {
       method,
       headers: {
-        Authorization: `Bearer ${secret}`,
-        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${auth}`,
+        "Content-Type": "application/json",
       },
-      body: params.toString(),
+      body: JSON.stringify(body),
       signal: AbortSignal.timeout(20_000),
     });
     const json = (await res.json()) as Record<string, unknown>;
     if (!res.ok) {
-      this.logger.warn(`stripe ${path} failed: ${JSON.stringify(json)}`);
-      throw new BadRequestException("stripe_request_failed");
+      this.logger.warn(`razorpay ${path} failed: ${JSON.stringify(json)}`);
+      throw new BadRequestException("razorpay_request_failed");
     }
     return json;
   }
@@ -289,26 +375,6 @@ export class BillingService {
   }
 }
 
-function flattenStripe(
-  obj: Record<string, unknown>,
-  params: URLSearchParams,
-  prefix = "",
-) {
-  for (const [k, v] of Object.entries(obj)) {
-    const key = prefix ? `${prefix}[${k}]` : k;
-    if (v === undefined || v === null) continue;
-    if (Array.isArray(v)) {
-      v.forEach((item, i) => {
-        if (item && typeof item === "object") {
-          flattenStripe(item as Record<string, unknown>, params, `${key}[${i}]`);
-        } else {
-          params.append(`${key}[${i}]`, String(item));
-        }
-      });
-    } else if (typeof v === "object") {
-      flattenStripe(v as Record<string, unknown>, params, key);
-    } else {
-      params.append(key, String(v));
-    }
-  }
+function firstWebOrigin(corsOrigin: string): string {
+  return corsOrigin.split(",")[0]?.trim() || "http://localhost:3000";
 }

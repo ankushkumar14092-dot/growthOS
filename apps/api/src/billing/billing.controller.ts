@@ -67,11 +67,13 @@ export class BillingController {
 
   @Post("billing/webhook")
   webhook(
-    @Req() req: { body?: unknown },
-    @Headers("stripe-signature") signature: string | undefined,
+    @Req() req: { rawBody?: Buffer; body?: unknown },
+    @Headers("x-razorpay-signature") signature: string | undefined,
     @Body() body: unknown,
   ) {
-    const payload = Buffer.from(JSON.stringify(body ?? req.body ?? {}), "utf8");
+    const payload =
+      req.rawBody ??
+      Buffer.from(JSON.stringify(body ?? req.body ?? {}), "utf8");
     return this.billing.handleWebhook(payload, signature);
   }
 }

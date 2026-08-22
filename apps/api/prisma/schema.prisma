@@ -53,7 +53,7 @@ model Organization {
   name             String    @db.VarChar(150)
   plan             PlanTier  @default(free)
   settings         Json      @default("{}")
-  stripeCustomerId String?   @map("stripe_customer_id") @db.VarChar(255)
+  razorpayCustomerId String?   @map("razorpay_customer_id") @db.VarChar(255)
   createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt        DateTime? @map("deleted_at") @db.Timestamptz(6)
@@ -312,8 +312,8 @@ model Subscription {
   id                   String    @id @default(uuid())
   organizationId       String    @map("organization_id")
   plan                 PlanTier  @default(free)
-  stripeSubscriptionId String?   @map("stripe_subscription_id") @db.VarChar(255)
-  stripePriceId        String?   @map("stripe_price_id") @db.VarChar(255)
+  razorpaySubscriptionId String?   @map("razorpay_subscription_id") @db.VarChar(255)
+  razorpayPlanId         String?   @map("razorpay_plan_id") @db.VarChar(255)
   active               Boolean   @default(true)
   periodStart          DateTime? @map("period_start") @db.Date
   periodEnd            DateTime? @map("period_end") @db.Date

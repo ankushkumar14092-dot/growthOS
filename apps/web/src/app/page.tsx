@@ -175,10 +175,9 @@ export default function LandingPage() {
         <h2 className="land-h2">Simple plans. Beta is free.</h2>
         <div className="land-price-row">
           {[
-            ["Free", "1 site"],
-            ["Starter", "$29 / month"],
-            ["Pro", "$99 / month"],
-            ["Agency", "$299 / month"],
+            ["Free", "₹0 · 2 sites"],
+            ["Starter", "₹3,999 / month"],
+            ["Agency", "₹15,999 / month"],
           ].map(([plan, price]) => (
             <div key={plan} className="land-price-item">
               <strong>{plan}</strong>
@@ -233,7 +232,7 @@ export default function LandingPage() {
         </form>
       </section>
 
-      <section className="land-section land-faq">
+      <section className="land-section land-faq" id="faq">
         <p className="land-kicker">FAQ</p>
         <h2 className="land-h2">Straight answers</h2>
         <div style={{ marginTop: 32 }}>
@@ -260,11 +259,71 @@ export default function LandingPage() {
               apply guide.
             </p>
           </details>
+          <details>
+            <summary>What is SEO vs AEO vs GEO?</summary>
+            <p>
+              SEO is classic search visibility. AEO helps answer engines surface
+              clear Q&amp;A. GEO (AI-visibility) improves how generative systems
+              understand and cite your site — titles, schema, llms.txt, and
+              structure all matter.
+            </p>
+          </details>
         </div>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "Is it safe to let AI write to my site?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "You approve every change. We backup first, verify live HTML after apply, and roll back automatically if verification fails.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Do I need an OpenAI key?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "No. Proposals work with deterministic rules. OpenAI only polishes meta copy when you add a key.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "What can it deploy today?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Deploy / verify / rollback for meta title, meta description, FAQ schema, and canonical URLs. WordPress writes live via the plugin; GitHub opens a PR; ZIP packages a fix pack; Live URL exports an apply guide.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "What is SEO vs AEO vs GEO?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "SEO is classic search visibility. AEO helps answer engines surface clear Q&A. GEO (AI-visibility) improves how generative systems understand and cite your site.",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
       </section>
 
       <footer className="land-footer">
         <span>AI-Growth-OS</span>
+        <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <a href="/#how">Product</a>
+          <a href="/#faq">FAQ</a>
+          <a href="/signup">Signup</a>
+          <a href="/login">Login</a>
+          <a href="/llms.txt">llms.txt</a>
+          <a href="/sitemap.xml">Sitemap</a>
+        </nav>
         <span>Private beta · Multi-connect scan · Multi-mode deploy</span>
       </footer>
     </main>

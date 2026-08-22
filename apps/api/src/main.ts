@@ -5,7 +5,7 @@ import { initSentry } from "./sentry";
 
 async function bootstrap() {
   await initSentry();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   const rawOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
   const origin = rawOrigin.includes(",")
     ? rawOrigin.split(",").map((o) => o.trim()).filter(Boolean)

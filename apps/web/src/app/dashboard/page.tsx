@@ -518,7 +518,7 @@ export default function MissionControlPage() {
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "var(--color-text-muted)" }}>
           Plan: <strong>{billing?.planLabel ?? org?.plan ?? "free"}</strong>
           {billing ? ` · ${billing.priceLabel}` : ""}
-          {billing && !billing.stripeConfigured ? " · stub mode (no Stripe keys)" : ""}
+          {billing && !billing.razorpayConfigured ? " · stub mode (no Razorpay keys)" : ""}
         </p>
         {billing && (
           <div style={{ display: "grid", gap: 10, maxWidth: 560 }}>
@@ -577,12 +577,12 @@ export default function MissionControlPage() {
                     const res = await apiBillingPortal(token, orgId);
                     window.location.href = res.url;
                   } catch (err) {
-                    setError(err instanceof Error ? err.message : "Portal failed");
+                    setError(err instanceof Error ? err.message : "Manage billing failed");
                     setBusy(null);
                   }
                 }}
               >
-                {busy === "portal" ? "…" : "Customer portal"}
+                {busy === "portal" ? "…" : "Cancel subscription"}
               </button>
             </div>
           </div>
