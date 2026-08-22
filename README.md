@@ -1,94 +1,161 @@
-# AI-Growth-OS
+# AI-Growth-OS (growthOS)
 
-**Your website’s relentless AI-driven growth engine.**
+**Your website’s relentless growth engine** — SEO · AEO · GEO (AI-visibility).
 
-**Day-1 (MVP) promise:** Connect WordPress → audit → safe AI fixes → one-click deploy → rollback → weekly re-audit.
+Connect a site → scan → approve AI proposals → deploy with verify/rollback (WordPress) or PR / apply guide (other modes).
 
-## Quick start
+---
+
+## Live product (already deployed)
+
+| Surface | URL |
+|---------|-----|
+| Web app | https://grothos.vercel.app |
+| API health | https://growthos-nbvo.onrender.com/health |
+| GitHub | https://github.com/ankushkumar14092-dot/growthOS |
+
+### App routes (web)
+
+| Route | What it is |
+|-------|------------|
+| `/` | Marketing landing |
+| `/login` · `/signup` | Auth |
+| `/onboarding` | Create workspace |
+| `/dashboard` | Mission Control (KPIs, tasks, sites) |
+| `/sites/connect` | Connect WordPress / GitHub / ZIP / Live URL |
+| `/sites/[id]` | Site scan, proposals, deploy |
+| `/job-runs/[id]` | Scan progress |
+| `/deployments/[id]` | Deploy / verify / rollback timeline |
+| `/billing` | Plans, Razorpay upgrade, usage |
+| `/team` | Workspace members |
+
+Push to `main` auto-deploys **web → Vercel**. **API → Render** if the service is linked to this repo (confirm latest deploy in the Render dashboard after each push).
+
+---
+
+## Do you need to do anything?
+
+**For day-to-day use of the live app:** you’re fine — open https://grothos.vercel.app, sign up / log in, connect a site, run a scan.
+
+**Only if you want full Razorpay test checkout in production**, finish these on the **Render** API service (Environment):
+
+1. `RAZORPAY_KEY_ID` = your `rzp_test_…` key  
+2. `RAZORPAY_KEY_SECRET` = matching secret  
+3. Optional but recommended: `RAZORPAY_WEBHOOK_SECRET` + webhook URL  
+   `https://growthos-nbvo.onrender.com/billing/webhook`  
+4. Optional (recurring subscriptions): `RAZORPAY_PLAN_STARTER` / `RAZORPAY_PLAN_AGENCY`  
+   Without plan IDs, upgrade opens a **Payment Link** (one-time test payment) instead.  
+5. `CORS_ORIGIN` must include `https://grothos.vercel.app` (comma-separate other aliases if needed).  
+6. After changing env vars → **Manual Deploy** on Render (or wait for auto-deploy).
+
+**Local Razorpay:** put the same keys in `apps/api/.env` and restart `npm run dev:api`.
+
+**Rename merchant “Mbsteach” → “grothos”:** Razorpay Dashboard → Account & Settings → Business details (account-level name; not controlled only by our code).
+
+**WordPress live deploy:** install the plugin ([docs/PLUGIN-INSTALL.md](docs/PLUGIN-INSTALL.md)), set `MOCK_WP_HEALTH=0` on the API.
+
+---
+
+## Quick start (local)
 
 Requires **Node 20+** and **Docker**.
 
 ```bash
-# 1) Infra (Postgres on host port 5433 — avoids clash with local Postgres on 5432)
+# 1) Infra (Postgres host :5433, Redis :6379)
 cp .env.example .env
 npm run db:up
 
-# 2) Install & build shared types
+# 2) Install & shared package
 npm install
 npm run build -w @ai-growth-os/shared
 
-# 3) API (http://localhost:4000/health)
-cp apps/api/.env.example apps/api/.env   # if needed
+# 3) API — http://localhost:4000/health
+cp apps/api/.env.example apps/api/.env
+# edit apps/api/.env (DB, JWT, optional Razorpay / OpenAI / Tavily)
 cd apps/api && npx prisma migrate dev && npx prisma generate && cd ../..
 npm run dev:api
 
-# 4) Web (http://localhost:3000) — signup / login / onboarding / dashboard
+# 4) Web — http://localhost:3000
 cp apps/web/.env.example apps/web/.env.local
+# NEXT_PUBLIC_API_URL=http://localhost:4000
 npm run dev:web
 ```
 
 | Path | Role |
 |------|------|
-| `apps/web` | Next.js — landing, auth, connect wizard, scan UI |
-| `apps/api` | NestJS — auth, orgs, sites, BullMQ scan worker |
-| `packages/shared` | `ChangeClass`, connection types, issue types |
-| `wordpress-plugin/` | WP REST (`health`, `apply_patch`, `rollback`) |
-| `docs/` | PRD, TRD, HLD/LLD, schema, UI, IMPL |
+| `apps/web` | Next.js — landing, auth, Mission Control, billing, scan UI |
+| `apps/api` | NestJS — auth, orgs, sites, BullMQ workers, Razorpay billing |
+| `packages/shared` | Shared types (issues, connection modes, change classes) |
+| `wordpress-plugin/` | WP REST: health, apply_patch, rollback |
+| `docs/` | PRD, architecture, pilot runbooks |
+
+---
+
+## Billing (Razorpay)
+
+| Plan | Price (INR) | Limits (summary) |
+|------|-------------|------------------|
+| Free | ₹0 | Small site/scan caps |
+| Starter | ₹3,999/mo | Higher sites + scans |
+| Agency | ₹15,999/mo | Agency-scale caps |
+
+- **No keys:** checkout uses **stub mode** (plan activates locally / without Razorpay UI).  
+- **Test keys only:** Upgrade on `/billing` opens a Razorpay **Payment Link**; after pay, return URL is `/billing?billing=paid`.  
+- **Subscriptions:** create monthly plans in Razorpay, set `RAZORPAY_PLAN_STARTER` / `RAZORPAY_PLAN_AGENCY`.  
+- Test card (Razorpay test mode): `4111 1111 1111 1111`, any future expiry, any CVV.
+
+Env templates: root [`.env.example`](.env.example) · [`apps/api/.env.example`](apps/api/.env.example).
+
+---
+
+## Connect modes
+
+| Mode | Scan | Live write | Notes |
+|------|------|------------|-------|
+| WordPress + plugin | Yes | Yes | Deploy → verify → rollback |
+| GitHub | Yes | PR | Merge + host redeploy |
+| ZIP | Yes | Fix pack | Download apply package |
+| Live URL | Yes | No | Read-only + apply guide |
+
+---
 
 ## Docs
 
 | Doc | Purpose |
 |-----|---------|
-| [docs/LIVE-SITE-GUIDE.md](docs/LIVE-SITE-GUIDE.md) | **How to use Site scan with a live site** (full trust loop) |
-| [docs/GROWTH-PILLARS.md](docs/GROWTH-PILLARS.md) | **SEO · AEO · GEO · AI-visibility** checklist + MVP vs roadmap |
-| [docs/PILOT-RUNBOOK.md](docs/PILOT-RUNBOOK.md) | **Pilot ops** — connect, scan, weekly automation, billing, rollback |
-| [docs/PLUGIN-INSTALL.md](docs/PLUGIN-INSTALL.md) | WordPress plugin install + staging WP |
+| [docs/LIVE-SITE-GUIDE.md](docs/LIVE-SITE-GUIDE.md) | Use Site scan with a live site |
+| [docs/GROWTH-PILLARS.md](docs/GROWTH-PILLARS.md) | SEO · AEO · GEO checklist |
+| [docs/PILOT-RUNBOOK.md](docs/PILOT-RUNBOOK.md) | Pilot ops, weekly automation, rollback |
+| [docs/PLUGIN-INSTALL.md](docs/PLUGIN-INSTALL.md) | WordPress plugin + staging WP |
 | [docs/PRD.md](docs/PRD.md) | Vision + MVP scope |
-| [docs/IMPL-MVP.md](docs/IMPL-MVP.md) | **Execute now** — phases 0–8 |
+| [docs/IMPL-MVP.md](docs/IMPL-MVP.md) | Implementation phases |
 | [docs/HLD-MVP.md](docs/HLD-MVP.md) / [docs/LLD-MVP.md](docs/LLD-MVP.md) | Architecture |
-| [docs/SCHEMA-MVP.md](docs/SCHEMA-MVP.md) | DDL |
-| [docs/UI-UX-BRIEF-MVP.md](docs/UI-UX-BRIEF-MVP.md) | Mission Control UI (v0.2) |
-| [docs/APP-FLOW-MVP.md](docs/APP-FLOW-MVP.md) | Screens / journeys |
-
-Scale/Vision docs are reference-only until pilots succeed.
-
-**Engineering rule:** Implement [IMPL-MVP](docs/IMPL-MVP.md) against HLD/LLD/SCHEMA/UI MVP docs.
-
-## Status
-
-Last verified: **2026-08-04** (Phases 0–6)
-
-| Phase | Status | Customer can… |
-|-------|--------|----------------|
-| Docs | Done | Read MVP plan & architecture |
-| 0 Foundations | Done | Run web + API + Postgres + Redis locally |
-| 1 Auth & orgs | **Verified** | Sign up, log in, create workspace |
-| 2 Multi-connect | **Verified** | Connect WP / GitHub / ZIP / Live URL |
-| 3 Universal scanner | **Verified** | Run scan; see pages + issues |
-| 4 AI proposals | **Verified** | Review title/meta/FAQ proposals; approve → draft patch |
-| 5 Deploy / verify / rollback | **Verified** | Deploy approved patches; Mission Timeline; auto-rollback |
-| 6 Mission Control | **Shipped** | See health, pulse, priorities, activity, search in one place |
-| 7 Automation & billing | **Shipped** | Weekly schedule, safe auto-apply, Stripe stub/checkout, usage |
-| 8 Pilot readiness | **Shipped** | Staging WP, plugin zip, PILOT-RUNBOOK, Sentry hooks, pilot metrics |
-
-**Founder decision (2026-08-04):** Core MVP complete. Track A in progress (real WP, onboarding, beta).
-
-**Track A + Phase 7/8:** See [docs/LIVE-SITE-GUIDE.md](docs/LIVE-SITE-GUIDE.md) · [docs/PILOT-RUNBOOK.md](docs/PILOT-RUNBOOK.md) · [docs/BETA-30-DAY.md](docs/BETA-30-DAY.md) · [docs/PLUGIN-INSTALL.md](docs/PLUGIN-INSTALL.md)
+| [docs/BETA-30-DAY.md](docs/BETA-30-DAY.md) | Beta plan |
 
 ```bash
-# Real WordPress staging (plugin mounted)
+# Local WordPress staging (plugin mounted)
 npm run wp:up          # http://localhost:8080
 npm run plugin:zip     # wordpress-plugin/ai-growth-os.zip
 # In apps/api/.env set MOCK_WP_HEALTH=0 and restart API
 ```
 
-**Validation gate before Phase 7:** ~5–10 real users · ~100 scans · ~50 approvals · ~20 deploys · users asking for weekly automation.
+---
 
-**Verification run (pass):**
-- Unit / typecheck / Mission Control + deploy smokes (Phases 0–6)
-- Infra: API `phase: "beta-track-a"`, Postgres `:5433`, optional WP `:8080`
+## Status (2026-08-22)
 
-**Not verified yet:** Live WP without mock by an external beta user; production Stripe webhooks; Sentry in a live project.
+| Area | Status |
+|------|--------|
+| Auth, orgs, multi-connect, scan, proposals | Done |
+| Deploy / verify / rollback (WP) · Mission Control | Done |
+| Dedicated `/billing` + `/team` routes | Done |
+| Razorpay (test keys + Payment Link fallback) | Done in code — set keys on Render for prod |
+| Stripe | Removed / replaced by Razorpay |
+| Production web (Vercel) | Live |
+| Production API (Render) | Live — confirm env + latest deploy after pushes |
+
+**Not required for basic scanning:** OpenAI, Tavily, SERP, Razorpay plan IDs.
+
+---
 
 ## License
 
