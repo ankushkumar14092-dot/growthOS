@@ -4,9 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import {
-  apiBilling,
-  apiBillingCheckout,
-  apiBillingPortal,
   apiDeleteSite,
   apiDeploySite,
   apiMe,
@@ -14,7 +11,6 @@ import {
   apiPilotMetrics,
   apiStartAudit,
   TOKEN_KEY,
-  type BillingSummaryDto,
   type MeResponse,
   type MissionControlDto,
   type PilotMetricsDto,
@@ -24,7 +20,6 @@ export default function MissionControlPage() {
   const router = useRouter();
   const [me, setMe] = useState<MeResponse | null>(null);
   const [mc, setMc] = useState<MissionControlDto | null>(null);
-  const [billing, setBilling] = useState<BillingSummaryDto | null>(null);
   const [pilot, setPilot] = useState<PilotMetricsDto | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,13 +27,11 @@ export default function MissionControlPage() {
   const orgId = me?.memberships[0]?.organization.id;
 
   const load = useCallback(async (token: string, organizationId: string) => {
-    const [data, bill, metrics] = await Promise.all([
+    const [data, metrics] = await Promise.all([
       apiMissionControl(token, organizationId),
-      apiBilling(token, organizationId).catch(() => null),
       apiPilotMetrics(token, organizationId).catch(() => null),
     ]);
     setMc(data);
-    setBilling(bill);
     setPilot(metrics);
   }, []);
 
@@ -161,21 +154,29 @@ export default function MissionControlPage() {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          gap: 16,
+          gap: 20,
           flexWrap: "wrap",
           alignItems: "flex-start",
-          marginBottom: 20,
+          marginBottom: 28,
         }}
       >
         <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>
+          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 600 }}>
             Mission Control
           </h1>
-          <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--color-text-muted)" }}>
+          <p
+            style={{
+              margin: "10px 0 0",
+              fontSize: 15,
+              lineHeight: 1.55,
+              color: "var(--color-text-muted)",
+              maxWidth: "42ch",
+            }}
+          >
             What happened, what needs you, what to do next.
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button
             type="button"
             style={secondaryBtn}
@@ -195,16 +196,19 @@ export default function MissionControlPage() {
       </header>
 
       {error && (
-        <p role="alert" style={{ color: "var(--color-error)", marginBottom: 12 }}>
-          {error}
-        </p>
+        <div role="alert" className="app-alert">
+          <span>{error}</span>
+          <button type="button" onClick={() => setError(null)}>
+            Dismiss
+          </button>
+        </div>
       )}
 
       {/* KPIs */}
       <section
         className="mc-grid mc-kpis"
         aria-label="Key metrics"
-        style={{ marginBottom: 20 }}
+        style={{ marginBottom: 28 }}
       >
         <Kpi
           label="Overall Health"
@@ -245,10 +249,10 @@ export default function MissionControlPage() {
       <section
         id="priority"
         className="mc-grid mc-main"
-        style={{ marginBottom: 20 }}
+        style={{ marginBottom: 28 }}
       >
         <Panel title="Priority Tasks">
-          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 8 }}>
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 12 }}>
             {mc.priorityTasks.map((t) => (
               <li key={t.id}>
                 <button
@@ -272,11 +276,11 @@ export default function MissionControlPage() {
         </Panel>
         <Panel title="Notifications">
           {mc.notifications.length === 0 ? (
-            <p style={{ margin: 0, fontSize: 14, color: "var(--color-text-muted)" }}>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--color-text-muted)" }}>
               No actionable alerts.
             </p>
           ) : (
-            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 8 }}>
+            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 12 }}>
               {mc.notifications.map((n) => (
                 <li key={n.id}>
                   <button
@@ -325,7 +329,7 @@ export default function MissionControlPage() {
         </Panel>
         <Panel id="activity" title="Activity Timeline">
           {mc.activity.length === 0 ? (
-            <p style={{ margin: 0, fontSize: 14, color: "var(--color-text-muted)" }}>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--color-text-muted)" }}>
               No activity yet. Connect a site and run a scan.
             </p>
           ) : (
@@ -399,31 +403,41 @@ export default function MissionControlPage() {
 
       {/* Website cards */}
       <section id="sites">
-        <h2 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 4px" }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, margin: "8px 0 8px" }}>
           Websites
         </h2>
-        <p style={{ margin: "0 0 12px", fontSize: 13, color: "var(--color-text-muted)" }}>
+        <p
+          style={{
+            margin: "0 0 18px",
+            fontSize: 14,
+            lineHeight: 1.5,
+            color: "var(--color-text-muted)",
+          }}
+        >
           Scores: SEO · AEO · GEO (AI-visibility = AEO + GEO)
         </p>
         {mc.sites.length === 0 ? (
           <Panel>
-            <p style={{ margin: 0, fontWeight: 600 }}>No sites yet</p>
-            <p style={{ margin: "8px 0 16px", fontSize: 14, color: "var(--color-text-muted)" }}>
-              Connect a website to start the growth loop.
-            </p>
-            <button
-              type="button"
-              style={primaryBtn}
-              onClick={() => router.push("/sites/connect")}
-            >
-              Connect website
-            </button>
+            <div className="mc-empty">
+              <p style={{ margin: 0, fontWeight: 600, fontSize: 17, color: "var(--color-navy)" }}>
+                No sites yet
+              </p>
+              <p>Connect a website to start the growth loop.</p>
+              <button
+                type="button"
+                style={primaryBtn}
+                onClick={() => router.push("/sites/connect")}
+              >
+                Connect website
+              </button>
+            </div>
           </Panel>
         ) : (
           <div className="mc-grid mc-sites">
             {mc.sites.map((site) => (
               <article
                 key={site.id}
+                className="app-panel"
                 style={{
                   padding: 16,
                   borderRadius: 12,
@@ -513,82 +527,6 @@ export default function MissionControlPage() {
         )}
       </section>
 
-      <section id="billing" style={{ marginTop: 32 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 8px" }}>Billing</h2>
-        <p style={{ margin: "0 0 12px", fontSize: 13, color: "var(--color-text-muted)" }}>
-          Plan: <strong>{billing?.planLabel ?? org?.plan ?? "free"}</strong>
-          {billing ? ` · ${billing.priceLabel}` : ""}
-          {billing && !billing.razorpayConfigured ? " · stub mode (no Razorpay keys)" : ""}
-        </p>
-        {billing && (
-          <div style={{ display: "grid", gap: 10, maxWidth: 560 }}>
-            <p style={{ margin: 0, fontSize: 13 }}>
-              Sites {billing.usage.sites}/{billing.limits.sites} · Scans (30d){" "}
-              {billing.usage.scansThisPeriod}/{billing.limits.scansPerMonth}
-            </p>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button
-                type="button"
-                style={primaryBtn}
-                disabled={Boolean(busy)}
-                onClick={async () => {
-                  const token = localStorage.getItem(TOKEN_KEY);
-                  if (!token || !orgId) return;
-                  setBusy("checkout-starter");
-                  try {
-                    const res = await apiBillingCheckout(token, orgId, "starter");
-                    window.location.href = res.url;
-                  } catch (err) {
-                    setError(err instanceof Error ? err.message : "Checkout failed");
-                    setBusy(null);
-                  }
-                }}
-              >
-                {busy === "checkout-starter" ? "…" : "Upgrade Starter"}
-              </button>
-              <button
-                type="button"
-                style={secondaryBtn}
-                disabled={Boolean(busy)}
-                onClick={async () => {
-                  const token = localStorage.getItem(TOKEN_KEY);
-                  if (!token || !orgId) return;
-                  setBusy("checkout-agency");
-                  try {
-                    const res = await apiBillingCheckout(token, orgId, "agency");
-                    window.location.href = res.url;
-                  } catch (err) {
-                    setError(err instanceof Error ? err.message : "Checkout failed");
-                    setBusy(null);
-                  }
-                }}
-              >
-                {busy === "checkout-agency" ? "…" : "Upgrade Agency"}
-              </button>
-              <button
-                type="button"
-                style={secondaryBtn}
-                disabled={Boolean(busy)}
-                onClick={async () => {
-                  const token = localStorage.getItem(TOKEN_KEY);
-                  if (!token || !orgId) return;
-                  setBusy("portal");
-                  try {
-                    const res = await apiBillingPortal(token, orgId);
-                    window.location.href = res.url;
-                  } catch (err) {
-                    setError(err instanceof Error ? err.message : "Manage billing failed");
-                    setBusy(null);
-                  }
-                }}
-              >
-                {busy === "portal" ? "…" : "Cancel subscription"}
-              </button>
-            </div>
-          </div>
-        )}
-      </section>
-
       {pilot && (
         <section style={{ marginTop: 28 }}>
           <h2 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 8px" }}>Pilot metrics</h2>
@@ -600,7 +538,6 @@ export default function MissionControlPage() {
         </section>
       )}
 
-      <span id="team" />
     </AppShell>
   );
 }
@@ -616,23 +553,32 @@ function Kpi(props: {
 }) {
   return (
     <div
-      className={props.pulse ? "growth-pulse" : undefined}
+      className={`app-panel${props.pulse ? " growth-pulse" : ""}`}
       style={{
-        padding: 14,
+        padding: "18px 16px",
         borderRadius: 12,
         border: "1px solid var(--color-border)",
         background: "var(--color-surface)",
+        minHeight: 108,
       }}
     >
-      <div style={{ fontSize: 12, color: "var(--color-text-muted)", fontWeight: 500 }}>
+      <div
+        style={{
+          fontSize: 13,
+          color: "var(--color-text-muted)",
+          fontWeight: 500,
+          lineHeight: 1.35,
+        }}
+      >
         {props.label}
       </div>
       <div
         style={{
-          marginTop: 6,
-          fontSize: props.emphasize ? 28 : 22,
+          marginTop: 10,
+          fontSize: props.emphasize ? 30 : 24,
           fontWeight: 700,
           letterSpacing: "-0.03em",
+          lineHeight: 1.1,
           color: props.danger
             ? "var(--color-error)"
             : props.warn
@@ -643,7 +589,7 @@ function Kpi(props: {
         {props.value}
       </div>
       {props.hint && (
-        <div style={{ marginTop: 4, fontSize: 12, color: "var(--color-teal)" }}>
+        <div style={{ marginTop: 8, fontSize: 13, color: "var(--color-teal)", fontWeight: 500 }}>
           {props.hint}
         </div>
       )}
@@ -660,18 +606,26 @@ function Panel(props: {
   return (
     <section
       id={props.id}
+      className="app-panel"
       style={{
-        padding: 16,
+        padding: 22,
         borderRadius: 12,
         border: "1px solid var(--color-border)",
         background: "var(--color-surface)",
       }}
     >
       {props.title && (
-        <div style={{ marginBottom: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>{props.title}</h2>
+        <div style={{ marginBottom: 16 }}>
+          <h2 style={{ margin: 0, fontSize: 17, fontWeight: 600 }}>{props.title}</h2>
           {props.subtitle && (
-            <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--color-text-muted)" }}>
+            <p
+              style={{
+                margin: "8px 0 0",
+                fontSize: 14,
+                lineHeight: 1.5,
+                color: "var(--color-text-muted)",
+              }}
+            >
               {props.subtitle}
             </p>
           )}
@@ -694,7 +648,9 @@ function PulseStat(props: { label: string; value: string; up?: boolean }) {
       >
         {props.value}
       </div>
-      <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{props.label}</div>
+      <div style={{ fontSize: 13, lineHeight: 1.4, color: "var(--color-text-muted)" }}>
+        {props.label}
+      </div>
     </div>
   );
 }
@@ -703,14 +659,16 @@ function MiniMetric(props: { label: string; value: number }) {
   return (
     <div
       style={{
-        padding: 8,
-        borderRadius: 8,
+        padding: "12px 10px",
+        borderRadius: 10,
         background: "var(--color-bg)",
         textAlign: "center",
       }}
     >
-      <div style={{ fontWeight: 700 }}>{props.value}</div>
-      <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{props.label}</div>
+      <div style={{ fontWeight: 700, fontSize: 16 }}>{props.value}</div>
+      <div style={{ fontSize: 12, lineHeight: 1.4, marginTop: 4, color: "var(--color-text-muted)" }}>
+        {props.label}
+      </div>
     </div>
   );
 }
@@ -741,34 +699,37 @@ function severityColor(s: string) {
 }
 
 const primaryBtn: React.CSSProperties = {
-  height: 40,
-  padding: "0 16px",
-  borderRadius: 8,
+  height: 44,
+  padding: "0 18px",
+  borderRadius: 10,
   border: "none",
   background: "var(--color-primary)",
   color: "#fff",
   fontWeight: 600,
+  fontSize: 14,
   cursor: "pointer",
 };
 
 const secondaryBtn: React.CSSProperties = {
-  height: 40,
-  padding: "0 16px",
-  borderRadius: 8,
+  height: 44,
+  padding: "0 18px",
+  borderRadius: 10,
   border: "1px solid var(--color-border)",
   background: "var(--color-surface)",
   fontWeight: 500,
+  fontSize: 14,
   cursor: "pointer",
   color: "var(--color-text)",
 };
 
 const dangerBtn: React.CSSProperties = {
-  height: 40,
-  padding: "0 16px",
-  borderRadius: 8,
+  height: 44,
+  padding: "0 18px",
+  borderRadius: 10,
   border: "1px solid #f0b4b4",
   background: "transparent",
   fontWeight: 500,
+  fontSize: 14,
   cursor: "pointer",
   color: "var(--color-error)",
 };
@@ -777,11 +738,13 @@ const rowBtn: React.CSSProperties = {
   width: "100%",
   textAlign: "left",
   display: "grid",
-  gap: 4,
-  padding: "10px 12px",
-  borderRadius: 8,
+  gap: 6,
+  padding: "14px 16px",
+  borderRadius: 10,
   border: "1px solid var(--color-border)",
   background: "var(--color-bg)",
   cursor: "pointer",
   color: "var(--color-text)",
+  fontSize: 14,
+  lineHeight: 1.45,
 };

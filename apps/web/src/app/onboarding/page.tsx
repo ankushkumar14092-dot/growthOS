@@ -49,14 +49,14 @@ export default function OnboardingPage() {
 
   if (!ready) {
     return (
-      <main style={pageStyle}>
+      <main className="auth-page" style={pageStyle}>
         <p style={{ color: "var(--color-text-muted)" }}>Loading…</p>
       </main>
     );
   }
 
   return (
-    <main style={pageStyle}>
+    <main className="auth-page" style={pageStyle}>
       <form onSubmit={onSubmit} style={cardStyle}>
         <h1 style={titleStyle}>Create workspace</h1>
         <p style={mutedStyle}>

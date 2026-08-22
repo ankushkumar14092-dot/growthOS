@@ -52,6 +52,39 @@ function authHeaders(token?: string | null): HeadersInit {
   return headers;
 }
 
+const API_ERROR_LABELS: Record<string, string> = {
+  razorpay_plan_not_configured:
+    "Paid plans aren’t set up yet. Add Razorpay plan IDs on the API, or stay on Free for now.",
+  checkout_not_needed_for_free: "You’re already on the Free plan.",
+  org_not_found: "Workspace not found.",
+  unauthorized: "Please sign in again.",
+  Forbidden: "You don’t have permission for that.",
+};
+
+/** Turn Nest/API error bodies into short, human-readable copy. */
+export function friendlyApiMessage(raw: string): string {
+  let code = raw.trim();
+  try {
+    const parsed = JSON.parse(raw) as { message?: unknown };
+    if (typeof parsed.message === "string") code = parsed.message;
+    else if (Array.isArray(parsed.message)) {
+      code = parsed.message.map(String).join(", ");
+    }
+  } catch {
+    // plain text body
+  }
+  if (API_ERROR_LABELS[code]) return API_ERROR_LABELS[code];
+  if (code.startsWith("{") || code.startsWith("[")) {
+    return "Something went wrong. Try again.";
+  }
+  return code.replace(/_/g, " ");
+}
+
+async function apiError(res: Response): Promise<string> {
+  return friendlyApiMessage(await res.text());
+}
+
+
 export async function apiSignup(body: {
   email: string;
   password: string;
@@ -62,7 +95,7 @@ export async function apiSignup(body: {
     headers: authHeaders(),
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as AuthResponse;
 }
 
@@ -72,7 +105,7 @@ export async function apiLogin(body: { email: string; password: string }) {
     headers: authHeaders(),
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as AuthResponse;
 }
 
@@ -81,7 +114,7 @@ export async function apiMe(token: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as MeResponse;
 }
 
@@ -94,7 +127,7 @@ export async function apiCreateOrg(
     headers: authHeaders(token),
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return res.json();
 }
 
@@ -103,7 +136,7 @@ export async function apiListOrgs(token: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return res.json();
 }
 
@@ -112,7 +145,7 @@ export async function apiConnectionTypes(token: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as ConnectionTypeInfo[];
 }
 
@@ -121,7 +154,7 @@ export async function apiListSites(token: string, organizationId: string) {
     `${API_URL()}/sites?organizationId=${encodeURIComponent(organizationId)}`,
     { headers: authHeaders(token), cache: "no-store" },
   );
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as SiteDto[];
 }
 
@@ -130,7 +163,7 @@ export async function apiGetSite(token: string, siteId: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as SiteDto;
 }
 
@@ -149,7 +182,7 @@ export async function apiCreateSite(
     headers: authHeaders(token),
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as SiteDto;
 }
 
@@ -158,7 +191,7 @@ export async function apiDeleteSite(token: string, siteId: string) {
     method: "DELETE",
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as { ok: boolean; id: string };
 }
 
@@ -172,7 +205,7 @@ export async function apiConnectSite(
     headers: authHeaders(token),
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return res.json() as Promise<{
     site: SiteDto;
     health: { ok: boolean; status: string; error?: string; details?: unknown };
@@ -191,7 +224,7 @@ export async function apiUploadZip(
     headers: { Authorization: `Bearer ${token}` },
     body: fd,
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return res.json() as Promise<{
     site: SiteDto;
     health: { ok: boolean; status: string };
@@ -204,7 +237,7 @@ export async function apiSiteHealth(token: string, siteId: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return res.json();
 }
 
@@ -229,7 +262,7 @@ export async function apiStartAudit(token: string, siteId: string) {
     method: "POST",
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as JobRunDto;
 }
 
@@ -238,7 +271,7 @@ export async function apiGetJobRun(token: string, jobRunId: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as JobRunDto;
 }
 
@@ -247,7 +280,7 @@ export async function apiListJobRuns(token: string, siteId: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as JobRunDto[];
 }
 
@@ -272,7 +305,7 @@ export async function apiListIssues(
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as IssueDto[];
 }
 
@@ -309,7 +342,7 @@ export async function apiListProposals(
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as ProposalDto[];
 }
 
@@ -318,7 +351,7 @@ export async function apiApproveProposal(token: string, proposalId: string) {
     method: "POST",
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as ProposalDto & { patchId?: string };
 }
 
@@ -327,7 +360,7 @@ export async function apiRejectProposal(token: string, proposalId: string) {
     method: "POST",
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as ProposalDto;
 }
 
@@ -394,7 +427,7 @@ export async function apiDeploySite(
     headers: authHeaders(token),
     body: JSON.stringify(body ?? {}),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as { deployments: DeploymentDto[] };
 }
 
@@ -403,7 +436,7 @@ export async function apiListDeployments(token: string, siteId: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as DeploymentDto[];
 }
 
@@ -412,7 +445,7 @@ export async function apiGetDeployment(token: string, deploymentId: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as DeploymentDetailDto;
 }
 
@@ -424,7 +457,7 @@ export async function apiRollbackDeployment(
     method: "POST",
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as DeploymentDto;
 }
 
@@ -505,7 +538,7 @@ export async function apiMissionControl(token: string, orgId: string) {
     `${API_URL()}/organizations/${orgId}/mission-control`,
     { headers: authHeaders(token), cache: "no-store" },
   );
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as MissionControlDto;
 }
 
@@ -514,7 +547,7 @@ export async function apiSearch(token: string, orgId: string, q: string) {
     `${API_URL()}/organizations/${orgId}/search?q=${encodeURIComponent(q)}`,
     { headers: authHeaders(token), cache: "no-store" },
   );
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as { query: string; results: SearchHit[] };
 }
 
@@ -559,7 +592,7 @@ export async function apiBilling(token: string, orgId: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as BillingSummaryDto;
 }
 
@@ -573,8 +606,36 @@ export async function apiBillingCheckout(
     headers: authHeaders(token),
     body: JSON.stringify({ plan }),
   });
-  if (!res.ok) throw new Error(await res.text());
-  return (await res.json()) as { mode: string; url: string; message?: string };
+  if (!res.ok) throw new Error(await apiError(res));
+  return (await res.json()) as {
+    mode: string;
+    url: string;
+    message?: string;
+    paymentLinkId?: string;
+    subscriptionId?: string;
+    keyId?: string;
+  };
+}
+
+export async function apiBillingConfirmLink(
+  token: string,
+  orgId: string,
+  paymentLinkId: string,
+) {
+  const res = await fetch(
+    `${API_URL()}/organizations/${orgId}/billing/confirm-link`,
+    {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ paymentLinkId }),
+    },
+  );
+  if (!res.ok) throw new Error(await apiError(res));
+  return (await res.json()) as {
+    activated: boolean;
+    status: string;
+    plan?: string;
+  };
 }
 
 export async function apiBillingPortal(token: string, orgId: string) {
@@ -582,7 +643,7 @@ export async function apiBillingPortal(token: string, orgId: string) {
     method: "POST",
     headers: authHeaders(token),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as { mode: string; url: string; message?: string };
 }
 
@@ -591,7 +652,7 @@ export async function apiPilotMetrics(token: string, orgId: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as PilotMetricsDto;
 }
 
@@ -605,7 +666,7 @@ export async function apiPatchSiteSettings(
     headers: authHeaders(token),
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as SiteDto;
 }
 
@@ -632,7 +693,7 @@ export async function apiResearchStatus(token: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as {
     tavily: boolean;
     serp: boolean;
@@ -645,7 +706,7 @@ export async function apiGetSiteResearch(token: string, siteId: string) {
     headers: authHeaders(token),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as {
     configured: { tavily: boolean; serp: boolean; serpProvider: string | null };
     research: SiteResearchDto | null;
@@ -662,7 +723,7 @@ export async function apiRunSiteResearch(
     headers: authHeaders(token),
     body: JSON.stringify(query ? { query } : {}),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as SiteResearchDto;
 }
 
@@ -686,7 +747,7 @@ export async function apiApplySiteResearch(
     headers: authHeaders(token),
     body: JSON.stringify({ approve: opts?.approve !== false }),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await apiError(res));
   return (await res.json()) as ResearchApplyResultDto;
 }
 

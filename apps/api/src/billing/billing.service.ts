@@ -113,14 +113,22 @@ export class BillingService {
       });
       return {
         mode: "stub" as const,
-        url: `${webOrigin}/dashboard?billing=stub_activated&plan=${plan}`,
+        url: `${webOrigin}/billing?billing=stub_activated&plan=${plan}`,
         message: "Razorpay not configured — plan activated in stub mode",
       };
     }
 
     const razorpayPlanId = plan === "agency" ? planAgency : planStarter;
     if (!razorpayPlanId) {
-      throw new BadRequestException("razorpay_plan_not_configured");
+      // Keys work, but Subscriptions/plans often need Razorpay dashboard enablement.
+      // Fall back to a one-time Payment Link so test checkout still opens.
+      return this.createPaymentLinkCheckout(
+        keyId,
+        keySecret,
+        organizationId,
+        plan,
+        webOrigin,
+      );
     }
 
     let customerId = org.razorpayCustomerId;
@@ -156,13 +164,102 @@ export class BillingService {
 
     const shortUrl = subscription.short_url
       ? String(subscription.short_url)
-      : `${webOrigin}/dashboard?billing=awaiting_payment&sub=${String(subscription.id)}`;
+      : `${webOrigin}/billing?billing=awaiting_payment&sub=${String(subscription.id)}`;
 
     return {
       mode: "razorpay" as const,
       url: shortUrl,
       subscriptionId: String(subscription.id),
       keyId,
+    };
+  }
+
+  async confirmPaymentLink(
+    userId: string,
+    organizationId: string,
+    paymentLinkId: string,
+  ) {
+    await this.requireRole(userId, organizationId, [MembershipRole.owner]);
+    const keyId = this.config.get<string>("RAZORPAY_KEY_ID");
+    const keySecret = this.config.get<string>("RAZORPAY_KEY_SECRET");
+    if (!keyId || !keySecret) {
+      throw new BadRequestException("razorpay_not_configured");
+    }
+
+    const link = await this.razorpayRequest(
+      keyId,
+      keySecret,
+      "GET",
+      `/v1/payment_links/${encodeURIComponent(paymentLinkId)}`,
+    );
+    const status = String(link.status ?? "");
+    const notes = (link.notes ?? {}) as {
+      organizationId?: string;
+      plan?: string;
+    };
+    const orgId = String(notes.organizationId ?? organizationId);
+    if (orgId !== organizationId) {
+      throw new ForbiddenException("org_forbidden");
+    }
+    if (status !== "paid") {
+      return { activated: false, status };
+    }
+    const plan = (notes.plan === "agency" ? "agency" : "starter") as PlanTier;
+    await this.activatePlan(orgId, plan, {
+      razorpaySubscriptionId: `plink_${paymentLinkId}`,
+    });
+    return { activated: true, status, plan };
+  }
+
+  private async createPaymentLinkCheckout(
+    keyId: string,
+    keySecret: string,
+    organizationId: string,
+    plan: PlanTier,
+    webOrigin: string,
+  ) {
+    const amount = plan === "agency" ? 1_599_900 : 399_900;
+    const brand = "grothos";
+    const link = await this.razorpayRequest(
+      keyId,
+      keySecret,
+      "POST",
+      "/v1/payment_links",
+      {
+        amount,
+        currency: "INR",
+        accept_partial: false,
+        description: `${brand} ${PLAN_LIMITS[plan].label} plan`,
+        customer: {
+          name: brand,
+        },
+        notify: { sms: false, email: false },
+        reminder_enable: false,
+        notes: {
+          organizationId,
+          plan,
+        },
+        callback_url: `${webOrigin}/billing?billing=paid&plan=${plan}`,
+        callback_method: "get",
+        options: {
+          checkout: {
+            name: brand,
+            description: `${PLAN_LIMITS[plan].label} · ${PLAN_LIMITS[plan].priceLabel}`,
+          },
+        },
+      },
+    );
+    const shortUrl = String(link.short_url ?? "");
+    if (!shortUrl) {
+      throw new BadRequestException("razorpay_payment_link_failed");
+    }
+    return {
+      mode: "razorpay_link" as const,
+      url: shortUrl,
+      paymentLinkId: String(link.id ?? ""),
+      keyId,
+      message:
+        "Opened Razorpay test payment link (add RAZORPAY_PLAN_* for subscriptions)",
     };
   }
 
@@ -192,7 +289,7 @@ export class BillingService {
     ) {
       return {
         mode: "stub" as const,
-        url: `${webOrigin}/dashboard#billing`,
+        url: `${webOrigin}/billing`,
         message: "Razorpay portal unavailable in stub mode — manage plan via checkout",
       };
     }
@@ -214,7 +311,7 @@ export class BillingService {
 
     return {
       mode: "razorpay" as const,
-      url: `${webOrigin}/dashboard?billing=cancel_requested#billing`,
+      url: `${webOrigin}/billing?billing=cancel_requested`,
       message: "Cancellation requested at cycle end",
     };
   }
@@ -238,15 +335,18 @@ export class BillingService {
       payload?: {
         subscription?: { entity?: Record<string, unknown> };
         payment?: { entity?: Record<string, unknown> };
+        payment_link?: { entity?: Record<string, unknown> };
       };
     };
 
     const type = event.event ?? "";
     const subEntity = event.payload?.subscription?.entity ?? {};
     const payEntity = event.payload?.payment?.entity ?? {};
+    const linkEntity = event.payload?.payment_link?.entity ?? {};
     const notes =
       (subEntity.notes as { organizationId?: string; plan?: string } | undefined) ??
       (payEntity.notes as { organizationId?: string; plan?: string } | undefined) ??
+      (linkEntity.notes as { organizationId?: string; plan?: string } | undefined) ??
       {};
 
     if (
@@ -259,6 +359,17 @@ export class BillingService {
       const subId = typeof subEntity.id === "string" ? subEntity.id : undefined;
       if (orgId) {
         await this.activatePlan(orgId, plan, { razorpaySubscriptionId: subId });
+      }
+    }
+
+    if (type === "payment_link.paid") {
+      const orgId = String(notes.organizationId ?? "");
+      const plan = (notes.plan === "agency" ? "agency" : "starter") as PlanTier;
+      const linkId = typeof linkEntity.id === "string" ? linkEntity.id : undefined;
+      if (orgId) {
+        await this.activatePlan(orgId, plan, {
+          razorpaySubscriptionId: linkId ? `plink_${linkId}` : undefined,
+        });
       }
     }
 
@@ -334,18 +445,20 @@ export class BillingService {
   private async razorpayRequest(
     keyId: string,
     keySecret: string,
-    method: "POST",
+    method: "POST" | "GET",
     path: string,
-    body: Record<string, unknown>,
+    body?: Record<string, unknown>,
   ) {
     const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
     const res = await fetch(`https://api.razorpay.com${path}`, {
       method,
       headers: {
         Authorization: `Basic ${auth}`,
-        "Content-Type": "application/json",
+        ...(method === "POST"
+          ? { "Content-Type": "application/json" }
+          : {}),
       },
-      body: JSON.stringify(body),
+      body: method === "POST" ? JSON.stringify(body ?? {}) : undefined,
       signal: AbortSignal.timeout(20_000),
     });
     const json = (await res.json()) as Record<string, unknown>;

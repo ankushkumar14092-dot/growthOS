@@ -106,57 +106,59 @@ export default function DeploymentTimelinePage() {
 
   return (
     <main style={{ maxWidth: 640, margin: "0 auto", padding: 32 }}>
-      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 8 }}>
-        <button
-          type="button"
-          onClick={() => router.push("/dashboard")}
-          style={linkBtn}
-        >
-          ← Mission Control
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push(`/sites/${dep.siteId}`)}
-          style={linkBtn}
-        >
-          Site
-        </button>
-      </div>
+      <div className="page-chrome">
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 8 }}>
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard")}
+            style={linkBtn}
+          >
+            ← Mission Control
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push(`/sites/${dep.siteId}`)}
+            style={linkBtn}
+          >
+            Site
+          </button>
+        </div>
 
-      <header style={{ margin: "16px 0 12px" }}>
-        <h1 style={{ margin: 0, fontSize: 24 }}>Mission Timeline</h1>
-        <p style={{ margin: "8px 0 0", color: "var(--color-text-muted)", fontSize: 14 }}>
-          {dep.action === "rollback" ? "Rollback" : "Deploy"} ·{" "}
-          {dep.proposalType?.replace(/_/g, " ") ?? "patch"} ·{" "}
-          <strong style={{ color: statusColor(dep.status) }}>{dep.status}</strong>
-          {dep.deployMode ? ` · ${dep.deployMode}` : ""}
-        </p>
-        {dep.prUrl && (
-          <p style={{ margin: "8px 0 0", fontSize: 14 }}>
-            <a href={dep.prUrl} target="_blank" rel="noreferrer">
-              Open GitHub PR →
-            </a>
+        <header style={{ margin: "8px 0 0" }}>
+          <h1 style={{ margin: 0, fontSize: 24 }}>Mission Timeline</h1>
+          <p style={{ margin: "8px 0 0", color: "var(--color-text-muted)", fontSize: 14 }}>
+            {dep.action === "rollback" ? "Rollback" : "Deploy"} ·{" "}
+            {dep.proposalType?.replace(/_/g, " ") ?? "patch"} ·{" "}
+            <strong style={{ color: statusColor(dep.status) }}>{dep.status}</strong>
+            {dep.deployMode ? ` · ${dep.deployMode}` : ""}
           </p>
-        )}
-        {dep.verifyResult?.note && (
-          <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--color-text-muted)" }}>
-            {dep.verifyResult.note}
-          </p>
-        )}
-        {Boolean(
-          dep.backup &&
-            typeof dep.backup === "object" &&
-            (dep.backup as { pack?: { instructions?: string[] } }).pack?.instructions,
-        ) && (
-          <ul style={{ margin: "12px 0 0", paddingLeft: 18, fontSize: 13 }}>
-            {(
-              (dep.backup as { pack: { instructions: string[] } }).pack.instructions
-            ).map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        )}
-      </header>
+          {dep.prUrl && (
+            <p style={{ margin: "8px 0 0", fontSize: 14 }}>
+              <a href={dep.prUrl} target="_blank" rel="noreferrer">
+                Open GitHub PR →
+              </a>
+            </p>
+          )}
+          {dep.verifyResult?.note && (
+            <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--color-text-muted)" }}>
+              {dep.verifyResult.note}
+            </p>
+          )}
+          {Boolean(
+            dep.backup &&
+              typeof dep.backup === "object" &&
+              (dep.backup as { pack?: { instructions?: string[] } }).pack?.instructions,
+          ) && (
+            <ul style={{ margin: "12px 0 0", paddingLeft: 18, fontSize: 13 }}>
+              {(
+                (dep.backup as { pack: { instructions: string[] } }).pack.instructions
+              ).map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          )}
+        </header>
+      </div>
 
       <div style={{ marginBottom: 20 }}>
         <TrustStrip
@@ -169,6 +171,7 @@ export default function DeploymentTimelinePage() {
 
       {dep.afterValue && (
         <section
+          className="app-panel"
           style={{
             marginBottom: 24,
             padding: 14,

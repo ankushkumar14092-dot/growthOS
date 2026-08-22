@@ -65,6 +65,23 @@ export class BillingController {
     return this.billing.createPortal(user.userId, id);
   }
 
+  @Post("organizations/:id/billing/confirm-link")
+  @UseGuards(JwtAuthGuard)
+  confirmLink(
+    @CurrentUser() user: { userId: string },
+    @Param("id") id: string,
+    @Body() body: { paymentLinkId?: string },
+  ) {
+    if (!body.paymentLinkId) {
+      return { activated: false, status: "missing_payment_link_id" };
+    }
+    return this.billing.confirmPaymentLink(
+      user.userId,
+      id,
+      body.paymentLinkId,
+    );
+  }
+
   @Post("billing/webhook")
   webhook(
     @Req() req: { rawBody?: Buffer; body?: unknown },

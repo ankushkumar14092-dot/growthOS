@@ -78,17 +78,19 @@ export default function JobRunPage() {
 
   return (
     <main style={{ maxWidth: 640, margin: "0 auto", padding: 32 }}>
-      <button
-        type="button"
-        onClick={() => router.push(job.siteId ? `/sites/${job.siteId}` : "/dashboard")}
-        style={linkBtn}
-      >
-        ← Back
-      </button>
-      <h1 style={{ margin: "16px 0 8px", fontSize: 24 }}>Scan status</h1>
-      <p style={{ margin: 0, color: "var(--color-text-muted)", fontSize: 14 }}>
-        {job.domain} · {job.connectionType} · {job.id.slice(0, 8)}…
-      </p>
+      <div className="page-chrome">
+        <button
+          type="button"
+          onClick={() => router.push(job.siteId ? `/sites/${job.siteId}` : "/dashboard")}
+          style={linkBtn}
+        >
+          ← Back
+        </button>
+        <h1 style={{ margin: "12px 0 8px", fontSize: 24 }}>Scan status</h1>
+        <p style={{ margin: 0, color: "var(--color-text-muted)", fontSize: 14 }}>
+          {job.domain} · {job.connectionType} · {job.id.slice(0, 8)}…
+        </p>
+      </div>
 
       {waitingApproval && (
         <div

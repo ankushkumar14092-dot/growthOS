@@ -44,26 +44,32 @@ export default function LandingPage() {
 
   return (
     <main className="land-page">
-      <section className="land-hero" aria-label="Hero">
+      <header className="land-header">
         <div className="land-top">
-          <span
+          <a
+            href="/"
             style={{
               fontWeight: 700,
               letterSpacing: "-0.03em",
               color: "var(--land-ink)",
               fontSize: 15,
+              textDecoration: "none",
             }}
           >
             AI-Growth-OS
-          </span>
-          <nav style={{ display: "flex", gap: 20 }}>
+          </a>
+          <nav style={{ display: "flex", gap: 20, alignItems: "center" }}>
             <a href="#how">Product</a>
             <a href="#trust">Trust</a>
             <a href="#beta">Beta</a>
-            <a href="/login">Login</a>
+            <a className="land-nav-login" href="/login">
+              Login
+            </a>
           </nav>
         </div>
+      </header>
 
+      <section className="land-hero" aria-label="Hero">
         <div className="land-hero-copy">
           <p className="land-brand">AI-Growth-OS</p>
           <h1 className="land-headline">

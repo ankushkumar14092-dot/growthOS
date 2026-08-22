@@ -262,8 +262,8 @@ export default function ConnectSitePage() {
   }
 
   return (
-    <main style={pageStyle}>
-      <div style={cardStyle}>
+    <main className="auth-page" style={pageStyle}>
+      <div className="app-panel" style={cardStyle}>
         <p style={{ margin: 0, fontSize: 13, color: "var(--color-text-muted)" }}>
           Connect Website
         </p>

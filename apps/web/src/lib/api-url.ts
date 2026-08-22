@@ -4,12 +4,13 @@ export function getApiUrl(): string {
   if (typeof window === "undefined") return configured;
 
   const host = window.location.hostname;
-  if (
-    host === "localhost" ||
-    host === "127.0.0.1" ||
-    host.endsWith(".vercel.app") ||
-    host.endsWith(".onrender.com")
-  ) {
+
+  // Always hit local API when the UI is on localhost (ignore stale LAN IPs in .env).
+  if (host === "localhost" || host === "127.0.0.1") {
+    return "http://localhost:4000";
+  }
+
+  if (host.endsWith(".vercel.app") || host.endsWith(".onrender.com")) {
     return configured;
   }
 

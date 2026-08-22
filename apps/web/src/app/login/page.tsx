@@ -34,7 +34,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={pageStyle}>
+    <main className="auth-page" style={pageStyle}>
       <div style={wrapStyle}>
         <p style={brandStyle}>
           <a href="/" style={{ color: "inherit", textDecoration: "none" }}>
@@ -67,7 +67,7 @@ export default function LoginPage() {
             <a href="/">Home</a>
           </p>
         </form>
-        <section style={faqBox} aria-label="FAQ">
+        <section className="auth-faq" style={faqBox} aria-label="FAQ">
           <h2 style={faqTitle}>FAQ</h2>
           <details>
             <summary>What is AI-Growth-OS?</summary>

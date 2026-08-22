@@ -311,41 +311,43 @@ export default function SiteDetailPage() {
 
   return (
     <main style={{ maxWidth: 880, margin: "0 auto", padding: 32 }}>
-      <button type="button" onClick={() => router.push("/dashboard")} style={linkBtn}>
-        ← Mission Control
-      </button>
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "16px 0 24px",
-          flexWrap: "wrap",
-          gap: 12,
-        }}
-      >
-        <div>
-          <h1 style={{ margin: 0, fontSize: 24 }}>Site scan</h1>
-          {site && (
-            <p style={{ margin: "6px 0 0", color: "var(--color-text-muted)", fontSize: 14 }}>
-              {site.domain} · {connectionStatusLabel(site)}
-            </p>
-          )}
-        </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button type="button" style={primaryBtn} disabled={busy} onClick={runScan}>
-            {busy ? "Starting…" : "Run scan"}
-          </button>
-          <button
-            type="button"
-            style={dangerBtn}
-            disabled={busy}
-            onClick={onRemoveWebsite}
-          >
-            Remove Website
-          </button>
-        </div>
-      </header>
+      <div className="page-chrome">
+        <button type="button" onClick={() => router.push("/dashboard")} style={linkBtn}>
+          ← Mission Control
+        </button>
+        <header
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            margin: "12px 0 0",
+            flexWrap: "wrap",
+            gap: 12,
+          }}
+        >
+          <div>
+            <h1 style={{ margin: 0, fontSize: 24 }}>Site scan</h1>
+            {site && (
+              <p style={{ margin: "6px 0 0", color: "var(--color-text-muted)", fontSize: 14 }}>
+                {site.domain} · {connectionStatusLabel(site)}
+              </p>
+            )}
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" style={primaryBtn} disabled={busy} onClick={runScan}>
+              {busy ? "Starting…" : "Run scan"}
+            </button>
+            <button
+              type="button"
+              style={dangerBtn}
+              disabled={busy}
+              onClick={onRemoveWebsite}
+            >
+              Remove Website
+            </button>
+          </div>
+        </header>
+      </div>
       {error && <p style={{ color: "#b42318" }}>{error}</p>}
 
       {needsWpConnect && (

@@ -12,8 +12,8 @@ import { useTheme } from "@/lib/theme";
 const NAV = [
   { label: "Mission Control", href: "/dashboard" },
   { label: "Connect", href: "/sites/connect" },
-  { label: "Billing", href: "/dashboard#billing" },
-  { label: "Team", href: "/dashboard#team" },
+  { label: "Billing", href: "/billing" },
+  { label: "Team", href: "/team" },
 ] as const;
 
 type Props = {
@@ -31,6 +31,7 @@ export function AppShell({ children, orgId, orgName, userLabel }: Props) {
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     if (!orgId || q.trim().length < 2) {
@@ -107,11 +108,12 @@ export function AppShell({ children, orgId, orgName, userLabel }: Props) {
             const active =
               item.href === "/dashboard"
                 ? pathname === "/dashboard"
-                : pathname.startsWith(item.href);
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
               <button
                 key={item.href}
                 type="button"
+                className={`app-nav-item${active ? " is-active" : ""}`}
                 onClick={() => router.push(item.href)}
                 style={{
                   textAlign: "left",
@@ -131,10 +133,20 @@ export function AppShell({ children, orgId, orgName, userLabel }: Props) {
           })}
         </nav>
         <div style={{ marginTop: "auto", display: "grid", gap: 8 }}>
-          <button type="button" onClick={toggle} style={ghostBtn}>
+          <button
+            type="button"
+            className="app-ghost-btn"
+            onClick={toggle}
+            style={ghostBtn}
+          >
             {theme === "dark" ? "Light mode" : "Dark mode"}
           </button>
-          <button type="button" onClick={logout} style={ghostBtn}>
+          <button
+            type="button"
+            className="app-ghost-btn"
+            onClick={logout}
+            style={ghostBtn}
+          >
             Log out
           </button>
         </div>
@@ -142,6 +154,7 @@ export function AppShell({ children, orgId, orgName, userLabel }: Props) {
 
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         <header
+          className="app-topbar"
           style={{
             display: "flex",
             alignItems: "center",
@@ -168,6 +181,7 @@ export function AppShell({ children, orgId, orgName, userLabel }: Props) {
             </label>
             <input
               id="mc-search"
+              className="app-search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onFocus={() => hits.length && setOpen(true)}
@@ -208,6 +222,7 @@ export function AppShell({ children, orgId, orgName, userLabel }: Props) {
                   <li key={`${h.type}-${h.id}`}>
                     <button
                       type="button"
+                      className="app-search-hit"
                       role="option"
                       onClick={() => {
                         setOpen(false);
