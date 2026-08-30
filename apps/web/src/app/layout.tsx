@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { WebSentry } from "@/components/WebSentry";
 import {
   organizationJsonLd,
@@ -18,13 +18,9 @@ import "./globals.css";
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans-loaded",
-  weight: ["400", "500", "600", "700"],
-});
-
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono-loaded",
-  weight: ["400", "500"],
+  weight: ["400", "600", "700"],
+  display: "swap",
+  adjustFontFallback: true,
 });
 
 const siteUrl = getSiteUrl();
@@ -81,7 +77,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${mono.variable}`}
+      className={sans.variable}
       // Browser extensions often inject attrs (e.g. crxlauncher) onto <html>
       // before hydration; ignore those mismatches.
       suppressHydrationWarning

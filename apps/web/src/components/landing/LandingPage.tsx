@@ -1,8 +1,6 @@
-"use client";
-
-import { FormEvent, useEffect, useState } from "react";
-import { joinWaitlist, trackEvent } from "@/lib/analytics";
 import { BRAND_NAME, PRODUCT_NAME, SITE_DISPLAY } from "@/lib/site";
+import { VisitorTracker } from "./VisitorTracker";
+import { WaitlistForm } from "./WaitlistForm";
 
 const STEPS = [
   { title: "Connect", meta: "Any site" },
@@ -37,37 +35,9 @@ const FAQ_ITEMS = [
 ];
 
 export function LandingPage() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [company, setCompany] = useState("");
-  const [msg, setMsg] = useState<string | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    trackEvent("visitor", { path: "/" });
-  }, []);
-
-  async function onWaitlist(e: FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setErr(null);
-    setMsg(null);
-    try {
-      const res = await joinWaitlist({ email, name, company, role: "beta" });
-      setMsg(res.message);
-      setEmail("");
-      setName("");
-      setCompany("");
-    } catch (error) {
-      setErr(error instanceof Error ? error.message : "Could not join waitlist");
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <main className="land-page">
+      <VisitorTracker path="/" />
       <header className="land-header">
         <div className="land-top">
           <a
@@ -225,41 +195,7 @@ export function LandingPage() {
           verify → rollback — and give blunt feedback. Scan-only users on URL /
           ZIP / GitHub are welcome too.
         </p>
-        <form className="land-form" onSubmit={onWaitlist}>
-          <input
-            required
-            type="email"
-            placeholder="Work email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            aria-label="Work email"
-          />
-          <input
-            placeholder="Name (optional)"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            aria-label="Name"
-          />
-          <input
-            placeholder="Company (optional)"
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
-            aria-label="Company"
-          />
-          {err && (
-            <p style={{ margin: 0, color: "var(--color-error)", fontSize: 13 }}>
-              {err}
-            </p>
-          )}
-          {msg && (
-            <p style={{ margin: 0, color: "var(--color-success)", fontSize: 13 }}>
-              {msg}
-            </p>
-          )}
-          <button className="land-btn-primary" type="submit" disabled={busy}>
-            {busy ? "Submitting…" : "Request beta access"}
-          </button>
-        </form>
+        <WaitlistForm />
       </section>
 
       <section className="land-section land-faq" id="faq">
