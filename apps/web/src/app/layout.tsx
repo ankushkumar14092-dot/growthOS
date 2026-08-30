@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, IBM_Plex_Mono } from "next/font/google";
 import { WebSentry } from "@/components/WebSentry";
-import { getSiteUrl, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
+import {
+  organizationJsonLd,
+  softwareApplicationJsonLd,
+  websiteJsonLd,
+} from "@/lib/structured-data";
+import {
+  BRAND_NAME,
+  getSiteUrl,
+  SITE_DISPLAY,
+  SITE_KEYWORDS,
+  SITE_TAGLINE,
+} from "@/lib/site";
 import "./globals.css";
 
 const sans = Plus_Jakarta_Sans({
@@ -21,33 +32,44 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${SITE_NAME} — AI-ready SEO growth`,
-    template: `%s | ${SITE_NAME}`,
+    default: `${BRAND_NAME} — AI SEO, AEO & GEO growth engine`,
+    template: `%s | ${BRAND_NAME}`,
   },
   description: SITE_TAGLINE,
+  keywords: SITE_KEYWORDS,
+  applicationName: BRAND_NAME,
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
-    siteName: SITE_NAME,
-    title: `${SITE_NAME} — grow with AI-ready SEO`,
+    siteName: SITE_DISPLAY,
+    title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
     description: SITE_TAGLINE,
     url: siteUrl,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — grow with AI-ready SEO`,
+    title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
     description: SITE_TAGLINE,
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   verification: {
     google:
       process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
       process.env.GOOGLE_SITE_VERIFICATION,
+  },
+  other: {
+    "apple-mobile-web-app-title": BRAND_NAME,
   },
 };
 
@@ -69,6 +91,16 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <WebSentry />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              organizationJsonLd(),
+              websiteJsonLd(),
+              softwareApplicationJsonLd(),
+            ]),
+          }}
+        />
         {children}
       </body>
     </html>
