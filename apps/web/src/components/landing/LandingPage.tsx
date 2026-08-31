@@ -1,5 +1,5 @@
-import Image from "next/image";
-import { BRAND_NAME, PRODUCT_NAME, SITE_DISPLAY } from "@/lib/site";
+import { BRAND_NAME, PRODUCT_NAME } from "@/lib/site";
+import { BrandMark } from "./BrandMark";
 import { VisitorTracker } from "./VisitorTracker";
 import { WaitlistForm } from "./WaitlistForm";
 
@@ -41,29 +41,8 @@ export function LandingPage() {
       <VisitorTracker path="/" />
       <header className="land-header">
         <div className="land-top">
-          <a
-            href="/"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              fontWeight: 700,
-              letterSpacing: "-0.03em",
-              color: "var(--land-ink)",
-              fontSize: 15,
-              textDecoration: "none",
-            }}
-          >
-            <Image
-              src="/icon-48.png"
-              alt=""
-              width={28}
-              height={28}
-              priority
-            />
-            {BRAND_NAME}
-          </a>
-          <nav style={{ display: "flex", gap: 20, alignItems: "center" }}>
+          <BrandMark variant="header" />
+          <nav className="land-nav">
             <a href="#how">Product</a>
             <a href="#trust">Trust</a>
             <a href="#beta">Beta</a>
@@ -76,9 +55,9 @@ export function LandingPage() {
 
       <section className="land-hero" aria-label="Hero">
         <div className="land-hero-copy">
-          <p className="land-brand">{SITE_DISPLAY}</p>
+          <BrandMark variant="hero" href={null} />
           <h1 className="land-headline">
-            {BRAND_NAME} — your website&apos;s relentless growth engine
+            Your website&apos;s relentless growth engine
           </h1>
           <p className="land-support">
             SEO · AEO · GEO (AI-visibility) — connect any site, scan, approve.
@@ -237,7 +216,7 @@ export function LandingPage() {
       </section>
 
       <footer className="land-footer">
-        <span>{SITE_DISPLAY}</span>
+        <BrandMark variant="header" />
         <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           <a href="/#how">Product</a>
           <a href="/#faq">FAQ</a>

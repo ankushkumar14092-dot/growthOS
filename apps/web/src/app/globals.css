@@ -545,8 +545,88 @@ html.dark .app-alert--warn {
   z-index: 1;
   width: 100%;
   max-width: 1120px;
-  padding: 8vh 0 4vh;
+  padding: 10vh 0 4vh;
   margin: 0 auto;
+}
+
+.land-brand-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.land-brand-link:hover .land-brand-name {
+  color: #0d9488;
+}
+
+.land-brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.land-brand-lockup--header {
+  gap: 10px;
+}
+
+.land-brand-lockup--hero {
+  gap: clamp(14px, 2.5vw, 20px);
+  margin-bottom: 4px;
+  animation: land-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.land-logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ffffff 0%, #f0f4f9 100%);
+  border: 1px solid rgba(11, 18, 32, 0.08);
+  box-shadow:
+    0 1px 2px rgba(11, 18, 32, 0.05),
+    0 6px 20px rgba(0, 102, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+}
+
+.land-logo-mark--hero {
+  width: clamp(56px, 11vw, 72px);
+  height: clamp(56px, 11vw, 72px);
+  border-color: rgba(13, 148, 136, 0.18);
+  box-shadow:
+    0 2px 4px rgba(11, 18, 32, 0.06),
+    0 12px 32px rgba(0, 102, 255, 0.14),
+    0 0 0 4px rgba(13, 148, 136, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.land-logo-mark img {
+  display: block;
+  object-fit: contain;
+}
+
+.land-brand-name {
+  margin: 0;
+  font-size: clamp(40px, 7vw, 68px);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--land-ink);
+  transition: color 0.2s ease;
+}
+
+.land-brand-name--header {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.land-nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
 }
 
 .land-brand {
@@ -560,12 +640,12 @@ html.dark .app-alert--warn {
 }
 
 .land-headline {
-  margin: 28px 0 0;
-  max-width: 16ch;
-  font-size: clamp(26px, 3.6vw, 40px);
+  margin: 22px 0 0;
+  max-width: 18ch;
+  font-size: clamp(28px, 3.8vw, 44px);
   font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+  letter-spacing: -0.032em;
+  line-height: 1.12;
   color: var(--land-ink);
   animation: land-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
 }
@@ -1025,12 +1105,17 @@ html.dark .app-alert--warn {
   border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
   flex-wrap: wrap;
   font-size: 13px;
   color: var(--color-text-muted);
   max-width: 1120px;
   margin: 0 auto;
+}
+
+.land-footer .land-brand-lockup--header {
+  opacity: 0.92;
 }
 
 @media (max-width: 800px) {
@@ -1055,10 +1140,19 @@ html.dark .app-alert--warn {
     margin: 0 -20px 0;
     padding: 24px 20px 28px;
   }
+
+  .land-brand-lockup--hero {
+    gap: 12px;
+  }
+
+  .land-headline {
+    max-width: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .land-brand,
+  .land-brand-lockup--hero,
   .land-headline,
   .land-support,
   .land-cta-row,
