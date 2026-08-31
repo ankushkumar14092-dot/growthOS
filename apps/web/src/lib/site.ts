@@ -13,11 +13,13 @@ export function getSiteUrl(): string {
 
 /** Primary brand for search + metadata */
 export const BRAND_NAME = "grothos";
+/** Name shown in Google search results, browser tab, and app manifest */
+export const SEARCH_DISPLAY_NAME = "growthOS";
 /** Product codename shown in-app */
 export const PRODUCT_NAME = "AI-Growth-OS";
 /** SEO site name (brand first) */
 export const SITE_NAME = BRAND_NAME;
-export const SITE_DISPLAY = `${BRAND_NAME} · ${PRODUCT_NAME}`;
+export const SITE_DISPLAY = `${SEARCH_DISPLAY_NAME} · ${PRODUCT_NAME}`;
 export const SITE_TAGLINE =
   "grothos is your AI-powered SEO, AEO & GEO growth engine — connect any site, scan issues, approve safe fixes, deploy with verify & rollback.";
 export const SITE_KEYWORDS = [

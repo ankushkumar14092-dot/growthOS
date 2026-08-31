@@ -1,4 +1,5 @@
-import { BRAND_NAME, PRODUCT_NAME, SITE_DISPLAY } from "@/lib/site";
+import Image from "next/image";
+import { BRAND_NAME, PRODUCT_NAME, SEARCH_DISPLAY_NAME, SITE_DISPLAY } from "@/lib/site";
 import { VisitorTracker } from "./VisitorTracker";
 import { WaitlistForm } from "./WaitlistForm";
 
@@ -43,6 +44,9 @@ export function LandingPage() {
           <a
             href="/"
             style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
               fontWeight: 700,
               letterSpacing: "-0.03em",
               color: "var(--land-ink)",
@@ -50,7 +54,14 @@ export function LandingPage() {
               textDecoration: "none",
             }}
           >
-            {BRAND_NAME}
+            <Image
+              src="/icon-48.png"
+              alt=""
+              width={28}
+              height={28}
+              priority
+            />
+            {SEARCH_DISPLAY_NAME}
           </a>
           <nav style={{ display: "flex", gap: 20, alignItems: "center" }}>
             <a href="#how">Product</a>

@@ -9,6 +9,7 @@ import {
 import {
   BRAND_NAME,
   getSiteUrl,
+  SEARCH_DISPLAY_NAME,
   SITE_DISPLAY,
   SITE_KEYWORDS,
   SITE_TAGLINE,
@@ -33,13 +34,24 @@ export const metadata: Metadata = {
   },
   description: SITE_TAGLINE,
   keywords: SITE_KEYWORDS,
-  applicationName: BRAND_NAME,
+  applicationName: SEARCH_DISPLAY_NAME,
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icon-96.png", sizes: "96x96", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: ["/favicon.ico"],
+  },
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
-    siteName: SITE_DISPLAY,
+    siteName: SEARCH_DISPLAY_NAME,
     title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
     description: SITE_TAGLINE,
     url: siteUrl,
@@ -65,7 +77,7 @@ export const metadata: Metadata = {
       process.env.GOOGLE_SITE_VERIFICATION,
   },
   other: {
-    "apple-mobile-web-app-title": BRAND_NAME,
+    "apple-mobile-web-app-title": SEARCH_DISPLAY_NAME,
   },
 };
 
