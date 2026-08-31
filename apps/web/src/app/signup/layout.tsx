@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "What is grothos?",
-    a: "grothos (AI-Growth-OS) is an AI growth engine for websites: connect a site, scan SEO/AEO/GEO issues, approve proposals, then deploy and verify.",
+    q: "What is growthOS?",
+    a: "growthOS is an AI growth engine for websites: connect a site, scan SEO/AEO/GEO issues, approve proposals, then deploy and verify.",
   },
   {
     q: "Does the Vercel app use AI?",

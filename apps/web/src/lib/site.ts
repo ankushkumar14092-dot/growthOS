@@ -8,24 +8,24 @@ export function getSiteUrl(): string {
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL.replace(/\/$/, "")}`;
   }
+  // Vercel project subdomain (URL stays grothos.vercel.app until custom domain is added)
   return "https://grothos.vercel.app";
 }
 
-/** Primary brand for search + metadata */
-export const BRAND_NAME = "grothos";
-/** Name shown in Google search results, browser tab, and app manifest */
-export const SEARCH_DISPLAY_NAME = "growthOS";
-/** Product codename shown in-app */
+/** Primary brand name — use everywhere in UI, SEO, and billing */
+export const BRAND_NAME = "growthOS";
+/** @deprecated Use BRAND_NAME */
+export const SEARCH_DISPLAY_NAME = BRAND_NAME;
+/** Product codename / legacy name */
 export const PRODUCT_NAME = "AI-Growth-OS";
-/** SEO site name (brand first) */
 export const SITE_NAME = BRAND_NAME;
-export const SITE_DISPLAY = `${SEARCH_DISPLAY_NAME} · ${PRODUCT_NAME}`;
+export const SITE_DISPLAY = BRAND_NAME;
 export const SITE_TAGLINE =
-  "grothos is your AI-powered SEO, AEO & GEO growth engine — connect any site, scan issues, approve safe fixes, deploy with verify & rollback.";
+  "growthOS is your AI-powered SEO, AEO & GEO growth engine — connect any site, scan issues, approve safe fixes, deploy with verify & rollback.";
 export const SITE_KEYWORDS = [
-  "grothos",
-  "AI-Growth-OS",
   "growthOS",
+  "growthos",
+  "AI-Growth-OS",
   "SEO tool",
   "AEO",
   "GEO",

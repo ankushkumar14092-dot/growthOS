@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { BRAND_NAME, PRODUCT_NAME, SEARCH_DISPLAY_NAME, SITE_DISPLAY } from "@/lib/site";
+import { BRAND_NAME, PRODUCT_NAME, SITE_DISPLAY } from "@/lib/site";
 import { VisitorTracker } from "./VisitorTracker";
 import { WaitlistForm } from "./WaitlistForm";
 
@@ -14,8 +14,8 @@ const STEPS = [
 
 const FAQ_ITEMS = [
   {
-    q: "What is grothos?",
-    a: "grothos (AI-Growth-OS) is an AI-powered SEO, AEO, and GEO growth engine. Connect a site, scan issues, approve safe fixes, and deploy with verify and rollback.",
+    q: "What is growthOS?",
+    a: "growthOS is an AI-powered SEO, AEO, and GEO growth engine. Connect a site, scan issues, approve safe fixes, and deploy with verify and rollback.",
   },
   {
     q: "Is it safe to let AI write to my site?",
@@ -61,7 +61,7 @@ export function LandingPage() {
               height={28}
               priority
             />
-            {SEARCH_DISPLAY_NAME}
+            {BRAND_NAME}
           </a>
           <nav style={{ display: "flex", gap: 20, alignItems: "center" }}>
             <a href="#how">Product</a>

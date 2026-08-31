@@ -2,7 +2,6 @@ import {
   BRAND_NAME,
   GITHUB_URL,
   PRODUCT_NAME,
-  SEARCH_DISPLAY_NAME,
   SITE_TAGLINE,
   getSiteUrl,
 } from "@/lib/site";
@@ -16,8 +15,8 @@ export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: SEARCH_DISPLAY_NAME,
-    alternateName: [BRAND_NAME, PRODUCT_NAME, "AI Growth OS", "grothos"],
+    name: BRAND_NAME,
+    alternateName: [PRODUCT_NAME, "AI Growth OS", "growthos"],
     url: site,
     logo: logoUrl(),
     image: logoUrl(),
@@ -31,14 +30,14 @@ export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: SEARCH_DISPLAY_NAME,
-    alternateName: [BRAND_NAME, PRODUCT_NAME, "grothos"],
+    name: BRAND_NAME,
+    alternateName: [PRODUCT_NAME, "growthos"],
     url: site,
     description: SITE_TAGLINE,
     inLanguage: "en",
     publisher: {
       "@type": "Organization",
-      name: SEARCH_DISPLAY_NAME,
+      name: BRAND_NAME,
       url: site,
       logo: logoUrl(),
     },
@@ -50,8 +49,8 @@ export function softwareApplicationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: SEARCH_DISPLAY_NAME,
-    alternateName: [BRAND_NAME, PRODUCT_NAME],
+    name: BRAND_NAME,
+    alternateName: [PRODUCT_NAME, "growthos"],
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     url: site,

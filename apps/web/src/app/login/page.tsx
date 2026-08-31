@@ -38,7 +38,7 @@ export default function LoginPage() {
       <div style={wrapStyle}>
         <p style={brandStyle}>
           <a href="/" style={{ color: "inherit", textDecoration: "none" }}>
-            AI-Growth-OS
+            growthOS
           </a>
         </p>
         <form onSubmit={onSubmit} style={cardStyle}>
@@ -70,7 +70,7 @@ export default function LoginPage() {
         <section className="auth-faq" style={faqBox} aria-label="FAQ">
           <h2 style={faqTitle}>FAQ</h2>
           <details>
-            <summary>What is AI-Growth-OS?</summary>
+            <summary>What is growthOS?</summary>
             <p style={faqBody}>
               Scan sites for SEO · AEO · GEO issues, approve safe fixes, then
               deploy with verify and rollback where supported.

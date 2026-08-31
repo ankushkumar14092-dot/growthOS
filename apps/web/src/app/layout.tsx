@@ -9,8 +9,6 @@ import {
 import {
   BRAND_NAME,
   getSiteUrl,
-  SEARCH_DISPLAY_NAME,
-  SITE_DISPLAY,
   SITE_KEYWORDS,
   SITE_TAGLINE,
 } from "@/lib/site";
@@ -34,7 +32,7 @@ export const metadata: Metadata = {
   },
   description: SITE_TAGLINE,
   keywords: SITE_KEYWORDS,
-  applicationName: SEARCH_DISPLAY_NAME,
+  applicationName: BRAND_NAME,
   manifest: "/site.webmanifest",
   icons: {
     icon: [
@@ -51,7 +49,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: SEARCH_DISPLAY_NAME,
+    siteName: BRAND_NAME,
     title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
     description: SITE_TAGLINE,
     url: siteUrl,
@@ -77,7 +75,7 @@ export const metadata: Metadata = {
       process.env.GOOGLE_SITE_VERIFICATION,
   },
   other: {
-    "apple-mobile-web-app-title": SEARCH_DISPLAY_NAME,
+    "apple-mobile-web-app-title": BRAND_NAME,
   },
 };
 

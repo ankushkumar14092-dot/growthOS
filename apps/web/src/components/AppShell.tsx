@@ -88,7 +88,7 @@ export function AppShell({ children, orgId, orgName, userLabel }: Props) {
               letterSpacing: "-0.02em",
             }}
           >
-            AI-Growth-OS
+            growthOS
           </p>
           <p
             style={{

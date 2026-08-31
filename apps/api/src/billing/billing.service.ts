@@ -219,7 +219,7 @@ export class BillingService {
     webOrigin: string,
   ) {
     const amount = plan === "agency" ? 1_599_900 : 399_900;
-    const brand = "grothos";
+    const brand = "growthOS";
     const link = await this.razorpayRequest(
       keyId,
       keySecret,

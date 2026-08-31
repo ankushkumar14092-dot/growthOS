@@ -1,4 +1,4 @@
-# AI-Growth-OS (growthOS)
+# growthOS
 
 **Your website’s relentless growth engine** — SEO · AEO · GEO (AI-visibility).
 
@@ -50,7 +50,7 @@ Push to `main` auto-deploys **web → Vercel**. **API → Render** if the servic
 
 **Local Razorpay:** put the same keys in `apps/api/.env` and restart `npm run dev:api`.
 
-**Rename merchant “Mbsteach” → “grothos”:** Razorpay Dashboard → Account & Settings → Business details (account-level name; not controlled only by our code).
+**Rename merchant “Mbsteach” → “growthOS”:** Razorpay Dashboard → Account & Settings → Business details (account-level name; not controlled only by our code).
 
 **WordPress live deploy:** install the plugin ([docs/PLUGIN-INSTALL.md](docs/PLUGIN-INSTALL.md)), set `MOCK_WP_HEALTH=0` on the API.
 

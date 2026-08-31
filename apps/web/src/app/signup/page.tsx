@@ -36,7 +36,7 @@ export default function SignupPage() {
       <div style={wrapStyle}>
         <p style={brandStyle}>
           <a href="/" style={{ color: "inherit", textDecoration: "none" }}>
-            AI-Growth-OS
+            growthOS
           </a>
         </p>
         <form onSubmit={onSubmit} style={cardStyle}>
