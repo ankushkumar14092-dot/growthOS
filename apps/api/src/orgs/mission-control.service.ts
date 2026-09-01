@@ -435,13 +435,13 @@ export class MissionControlService {
     );
 
     let health = pillars.overall;
-    if (!latestJob?.createdAt) health = Math.max(5, health - 15);
+    if (!latestJob?.createdAt) health = Math.max(0, health - 15);
     else {
       const ageH = (Date.now() - latestJob.createdAt.getTime()) / 36e5;
-      if (ageH > 24 * 14) health = Math.max(5, health - 10);
-      else if (ageH > 24 * 7) health = Math.max(5, health - 4);
+      if (ageH > 24 * 14) health = Math.max(0, health - 10);
+      else if (ageH > 24 * 7) health = Math.max(0, health - 4);
     }
-    if (pending > 0) health = Math.max(5, health - 2);
+    if (pending > 0) health = Math.max(0, health - 2);
 
     return {
       id: site.id,

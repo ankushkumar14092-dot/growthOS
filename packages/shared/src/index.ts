@@ -475,7 +475,7 @@ const PILLAR_WEIGHT: Record<IssueType, number> = {
   missing_open_graph: 5,
 };
 
-function clampScore(n: number, min = 5, max = 99) {
+function clampScore(n: number, min = 0, max = 100) {
   return Math.max(min, Math.min(max, Math.round(n)));
 }
 
@@ -485,17 +485,27 @@ export function scoreGrowthPillars(
   opts?: { connected?: boolean },
 ): GrowthPillarScores {
   const connected = opts?.connected ?? true;
-  let seo = connected ? 92 : 55;
-  let aeo = connected ? 90 : 55;
-  let geo = connected ? 88 : 52;
 
-  for (const raw of issueTypes) {
-    const t = raw as IssueType;
+  // Penalize each issue category once (not once per crawled page).
+  const uniqueTypes = [...new Set(issueTypes)] as IssueType[];
+
+  let seo = 100;
+  let aeo = 100;
+  let geo = 100;
+
+  for (const t of uniqueTypes) {
     const w = PILLAR_WEIGHT[t] ?? 3;
     const pillars = ISSUE_PILLARS[t] ?? ["seo"];
     if (pillars.includes("seo")) seo -= w;
     if (pillars.includes("aeo")) aeo -= w;
     if (pillars.includes("geo")) geo -= w;
+  }
+
+  // Scan-only / disconnected: small one-time penalty, not a fake ~55 baseline.
+  if (!connected) {
+    seo -= 8;
+    aeo -= 6;
+    geo -= 6;
   }
 
   seo = clampScore(seo);
