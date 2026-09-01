@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { LandingPage } from "@/components/landing/LandingPage";
-
-export const dynamic = "force-static";
 import { BRAND_NAME, getSiteUrl, SITE_KEYWORDS, SITE_TAGLINE } from "@/lib/site";
 
 const site = getSiteUrl();
@@ -19,6 +17,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
-  return <LandingPage />;
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ beta?: string }>;
+}) {
+  const params = await searchParams;
+  const betaNotice =
+    params.beta === "ok" ? "ok" : params.beta === "error" ? "error" : null;
+
+  return <LandingPage betaNotice={betaNotice} />;
 }

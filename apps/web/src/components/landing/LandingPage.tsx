@@ -1,7 +1,8 @@
-import { BRAND_NAME, PRODUCT_NAME } from "@/lib/site";
+import { BRAND_NAME } from "@/lib/site";
+import { submitBetaWaitlist } from "@/app/actions/waitlist";
+import { BrandText } from "@/components/BrandText";
 import { BrandMark } from "./BrandMark";
 import { VisitorTracker } from "./VisitorTracker";
-import { WaitlistForm } from "./WaitlistForm";
 
 const STEPS = [
   { title: "Connect", meta: "Any site" },
@@ -12,10 +13,10 @@ const STEPS = [
   { title: "Rollback", meta: "If needed" },
 ];
 
-const FAQ_ITEMS = [
+const FAQ_SCHEMA = [
   {
-    q: "What is growthOS?",
-    a: "growthOS is an AI-powered SEO, AEO, and GEO growth engine. Connect a site, scan issues, approve safe fixes, and deploy with verify and rollback.",
+    q: `What is ${BRAND_NAME}?`,
+    a: `${BRAND_NAME} is an AI-powered SEO, AEO, and GEO growth engine. Connect a site, scan issues, approve safe fixes, and deploy with verify and rollback.`,
   },
   {
     q: "Is it safe to let AI write to my site?",
@@ -35,7 +36,39 @@ const FAQ_ITEMS = [
   },
 ];
 
-export function LandingPage() {
+const FAQ_ITEMS = [
+  {
+    q: FAQ_SCHEMA[0].q,
+    a: (
+      <>
+        <BrandText /> is an AI-powered SEO, AEO, and GEO growth engine. Connect a
+        site, scan issues, approve safe fixes, and deploy with verify and rollback.
+      </>
+    ),
+  },
+  {
+    q: FAQ_SCHEMA[1].q,
+    a: FAQ_SCHEMA[1].a,
+  },
+  {
+    q: FAQ_SCHEMA[2].q,
+    a: FAQ_SCHEMA[2].a,
+  },
+  {
+    q: FAQ_SCHEMA[3].q,
+    a: FAQ_SCHEMA[3].a,
+  },
+  {
+    q: FAQ_SCHEMA[4].q,
+    a: FAQ_SCHEMA[4].a,
+  },
+];
+
+export function LandingPage({
+  betaNotice = null,
+}: {
+  betaNotice?: "ok" | "error" | null;
+}) {
   return (
     <main className="land-page">
       <VisitorTracker path="/" />
@@ -54,22 +87,30 @@ export function LandingPage() {
       </header>
 
       <section className="land-hero" aria-label="Hero">
-        <div className="land-hero-copy">
-          <BrandMark variant="hero" href={null} />
-          <h1 className="land-headline">
-            Your website&apos;s relentless growth engine
-          </h1>
-          <p className="land-support">
-            SEO · AEO · GEO (AI-visibility) — connect any site, scan, approve.
-            On WordPress: deploy, verify, and rollback safely.
-          </p>
-          <div className="land-cta-row">
-            <a className="land-btn-primary" href="#beta">
-              Join Private Beta
-            </a>
-            <a className="land-btn-ghost" href="/signup">
-              Create account
-            </a>
+        <div className="land-hero-main">
+          <div className="land-hero-copy">
+            <BrandMark variant="hero" href={null} />
+            <h1 className="land-headline">
+              <span className="land-headline-lead">
+                Your website&apos;s{" "}
+                <span className="land-headline-accent">relentless</span>
+              </span>
+              <br />
+              <span className="land-headline-display">growth engine</span>
+            </h1>
+            <p className="land-support">
+              <BrandText /> is your AI-powered SEO · AEO · GEO (AI-visibility) platform
+              — connect any site, scan, approve. On WordPress: deploy, verify, and
+              rollback safely.
+            </p>
+            <div className="land-cta-row">
+              <a className="land-btn-primary" href="#beta">
+                <span>Join Private Beta</span>
+              </a>
+              <a className="land-btn-ghost" href="/signup">
+                Create account
+              </a>
+            </div>
           </div>
         </div>
 
@@ -178,14 +219,64 @@ export function LandingPage() {
       </section>
 
       <section id="beta" className="land-section land-beta">
-        <p className="land-kicker">Private beta</p>
-        <h2 className="land-h2">Try the real trust loop</h2>
-        <p className="land-lead">
-          For teams who will try the full loop — especially WordPress deploy →
-          verify → rollback — and give blunt feedback. Scan-only users on URL /
-          ZIP / GitHub are welcome too.
-        </p>
-        <WaitlistForm />
+        <div className="land-beta-inner">
+          <div className="land-beta-copy">
+            <p className="land-kicker">Private beta</p>
+            <h2 className="land-h2 land-beta-title">Try the real trust loop</h2>
+            <p className="land-lead land-beta-lead">
+              For teams who will try the full loop — especially WordPress deploy →
+              verify → rollback — and give blunt feedback. Scan-only users on URL /
+              ZIP / GitHub are welcome too.
+            </p>
+          </div>
+          <div className="land-beta-panel">
+            <p className="land-form-heading">Request beta access</p>
+            <form action={submitBetaWaitlist} className="land-form">
+              <div className="land-form-field">
+                <label htmlFor="waitlist-email">Work email</label>
+                <input
+                  id="waitlist-email"
+                  name="email"
+                  required
+                  type="email"
+                  placeholder="you@company.com"
+                  autoComplete="email"
+                />
+              </div>
+              <div className="land-form-field">
+                <label htmlFor="waitlist-name">Name (optional)</label>
+                <input
+                  id="waitlist-name"
+                  name="name"
+                  placeholder="Your name"
+                  autoComplete="name"
+                />
+              </div>
+              <div className="land-form-field">
+                <label htmlFor="waitlist-company">Company (optional)</label>
+                <input
+                  id="waitlist-company"
+                  name="company"
+                  placeholder="Company or agency"
+                  autoComplete="organization"
+                />
+              </div>
+              {betaNotice === "ok" ? (
+                <p className="land-form-msg land-form-msg--success">
+                  Thanks — you&apos;re on the beta list. We&apos;ll be in touch.
+                </p>
+              ) : null}
+              {betaNotice === "error" ? (
+                <p className="land-form-msg land-form-msg--error">
+                  Could not join the waitlist. Please try again.
+                </p>
+              ) : null}
+              <button className="land-btn-primary land-form-submit" type="submit">
+                <span>Request beta access</span>
+              </button>
+            </form>
+          </div>
+        </div>
       </section>
 
       <section className="land-section land-faq" id="faq">
@@ -205,7 +296,7 @@ export function LandingPage() {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "FAQPage",
-              mainEntity: FAQ_ITEMS.map((item) => ({
+              mainEntity: FAQ_SCHEMA.map((item) => ({
                 "@type": "Question",
                 name: item.q,
                 acceptedAnswer: { "@type": "Answer", text: item.a },
@@ -225,8 +316,8 @@ export function LandingPage() {
           <a href="/llms.txt">llms.txt</a>
           <a href="/sitemap.xml">Sitemap</a>
         </nav>
-        <span>
-          {PRODUCT_NAME} private beta · Multi-connect scan · Multi-mode deploy
+        <span className="land-footer-note">
+          <BrandText /> private beta · Multi-connect scan · Multi-mode deploy
         </span>
       </footer>
     </main>

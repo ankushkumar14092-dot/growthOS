@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { BrandMark } from "@/components/landing/BrandMark";
 import {
   apiSearch,
   TOKEN_KEY,
@@ -79,17 +80,7 @@ export function AppShell({ children, orgId, orgName, userLabel }: Props) {
         }}
       >
         <div style={{ margin: "4px 0 16px" }}>
-          <p
-            style={{
-              margin: 0,
-              fontWeight: 700,
-              fontSize: 15,
-              color: "var(--color-navy)",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            growthOS
-          </p>
+          <BrandMark variant="header" href="/dashboard" />
           <p
             style={{
               margin: "4px 0 0",

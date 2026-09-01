@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Instrument_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import { WebSentry } from "@/components/WebSentry";
 import {
   organizationJsonLd,
@@ -17,7 +17,15 @@ import "./globals.css";
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans-loaded",
-  weight: ["400", "600", "700"],
+  weight: ["400", "600", "700", "800"],
+  display: "swap",
+  adjustFontFallback: true,
+});
+
+const display = Instrument_Sans({
+  subsets: ["latin"],
+  variable: "--font-display-loaded",
+  weight: ["500", "600", "700"],
   display: "swap",
   adjustFontFallback: true,
 });
@@ -87,7 +95,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={sans.variable}
+      className={`${sans.variable} ${display.variable}`}
       // Browser extensions often inject attrs (e.g. crxlauncher) onto <html>
       // before hydration; ignore those mismatches.
       suppressHydrationWarning

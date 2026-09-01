@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { BrandMark } from "@/components/landing/BrandMark";
 import { apiSignup, TOKEN_KEY } from "@/lib/api";
 import { trackEvent } from "@/lib/analytics";
 
@@ -34,11 +35,9 @@ export default function SignupPage() {
   return (
     <main className="auth-page" style={pageStyle}>
       <div style={wrapStyle}>
-        <p style={brandStyle}>
-          <a href="/" style={{ color: "inherit", textDecoration: "none" }}>
-            growthOS
-          </a>
-        </p>
+        <div className="auth-brand-wrap">
+          <BrandMark variant="header" />
+        </div>
         <form onSubmit={onSubmit} style={cardStyle}>
           <h1 style={titleStyle}>Create account</h1>
           <p style={mutedStyle}>
@@ -112,14 +111,6 @@ const wrapStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: 16,
-};
-
-const brandStyle: React.CSSProperties = {
-  margin: 0,
-  fontWeight: 700,
-  letterSpacing: "-0.03em",
-  fontSize: 15,
-  color: "var(--color-navy)",
 };
 
 const cardStyle: React.CSSProperties = {

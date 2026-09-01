@@ -1,24 +1,22 @@
 import Image from "next/image";
-import { BRAND_NAME } from "@/lib/site";
+import { BrandText } from "@/components/BrandText";
 
 type Props = {
-  /** Compact nav size vs large hero lockup */
+  /** Compact nav · hero eyebrow · larger hero lockup */
   variant?: "header" | "hero";
-  /** Wrap in link to home — omit on hero when brand sits above the h1 */
+  /** Wrap in link to home — omit on hero when brand sits in the h1 */
   href?: string | null;
 };
 
 export function BrandMark({ variant = "header", href = "/" }: Props) {
   const isHero = variant === "hero";
-  const iconSize = isHero ? 36 : 22;
-  const markSize = isHero ? 64 : 36;
+  const iconSize = isHero ? 28 : 24;
 
   const content = (
     <>
       <span
         className={`land-logo-mark${isHero ? " land-logo-mark--hero" : ""}`}
-        style={isHero ? undefined : { width: markSize, height: markSize }}
-        aria-hidden={isHero ? undefined : true}
+        aria-hidden
       >
         <Image
           src="/icon-48.png"
@@ -28,9 +26,7 @@ export function BrandMark({ variant = "header", href = "/" }: Props) {
           priority={isHero}
         />
       </span>
-      <span className={isHero ? "land-brand-name" : "land-brand-name land-brand-name--header"}>
-        {BRAND_NAME}
-      </span>
+      <BrandText size={isHero ? "xl" : "md"} />
     </>
   );
 

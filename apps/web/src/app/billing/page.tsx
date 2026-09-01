@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { BrandText } from "@/components/BrandText";
 import { AppShell } from "@/components/AppShell";
 import { useWorkspace } from "@/lib/use-workspace";
 import {
@@ -154,7 +155,7 @@ export default function BillingPage() {
             maxWidth: "48ch",
           }}
         >
-          Manage your growthOS plan, usage limits, and Razorpay upgrades.
+          Manage your <BrandText /> plan, usage limits, and Razorpay upgrades.
         </p>
       </header>
 
