@@ -8,8 +8,8 @@ export function getSiteUrl(): string {
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL.replace(/\/$/, "")}`;
   }
-  // Vercel project subdomain (URL stays grothos.vercel.app until custom domain is added)
-  return "https://grothos.vercel.app";
+  // Custom domain (production). Fallback until NEXT_PUBLIC_SITE_URL is set on Vercel.
+  return "https://grothos.in";
 }
 
 /** Primary brand name — use everywhere in UI, SEO, and billing */

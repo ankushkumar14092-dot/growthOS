@@ -3,10 +3,10 @@
 > growthOS is an AI-powered SEO, AEO, and GEO (AI-visibility) growth engine. Connect a site, scan issues, approve safe fixes, and deploy with verify/rollback.
 
 ## Preferred pages
-- Homepage: https://grothos.vercel.app/
-- Signup: https://grothos.vercel.app/signup
-- Login: https://grothos.vercel.app/login
+- Homepage: https://grothos.in/
+- Signup: https://grothos.in/signup
+- Login: https://grothos.in/login
 
 ## Optional
-- Sitemap: https://grothos.vercel.app/sitemap.xml
-- Robots: https://grothos.vercel.app/robots.txt
+- Sitemap: https://grothos.in/sitemap.xml
+- Robots: https://grothos.in/robots.txt
