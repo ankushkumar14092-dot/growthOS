@@ -155,7 +155,7 @@ npm run plugin:zip     # wordpress-plugin/ai-growth-os.zip
 | Production web (Vercel) | Live at **https://grothos.in** |
 | Custom domain (grothos.in) | Live — apex → www redirect on Vercel |
 | Google Search Console | Domain verified · sitemap submitted · indexing requested |
-| Production API (Render) | Live — set `CORS_ORIGIN` for grothos.in domains |
+| Production API (Render) | Live — grothos.in CORS allowed in code (env optional) |
 
 **Not required for basic scanning:** OpenAI, Tavily, SERP, Razorpay plan IDs.
 

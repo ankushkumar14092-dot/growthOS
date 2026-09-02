@@ -1,15 +1,13 @@
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
+import { resolveCorsOrigins } from "./cors-origins";
 import { initSentry } from "./sentry";
 
 async function bootstrap() {
   await initSentry();
   const app = await NestFactory.create(AppModule, { rawBody: true });
-  const rawOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
-  const configured = rawOrigin.includes(",")
-    ? rawOrigin.split(",").map((o) => o.trim()).filter(Boolean)
-    : [rawOrigin.trim()].filter(Boolean);
+  const configured = resolveCorsOrigins(process.env.CORS_ORIGIN);
   const allowLanInDev = process.env.NODE_ENV !== "production";
   const isPrivateLan = (origin: string) =>
     /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/i.test(

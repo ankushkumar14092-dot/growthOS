@@ -9,6 +9,7 @@ import { ConfigService } from "@nestjs/config";
 import { MembershipRole, PlanTier } from "@prisma/client";
 import { createHmac, timingSafeEqual } from "crypto";
 import { PrismaService } from "../prisma/prisma.service";
+import { primaryWebOrigin } from "../cors-origins";
 import { UsageService } from "./usage.service";
 
 const PLAN_LIMITS: Record<
@@ -103,7 +104,7 @@ export class BillingService {
     const keySecret = this.config.get<string>("RAZORPAY_KEY_SECRET");
     const planStarter = this.config.get<string>("RAZORPAY_PLAN_STARTER");
     const planAgency = this.config.get<string>("RAZORPAY_PLAN_AGENCY");
-    const webOrigin = firstWebOrigin(
+    const webOrigin = primaryWebOrigin(
       this.config.get<string>("CORS_ORIGIN") ?? "http://localhost:3000",
     );
 
@@ -272,7 +273,7 @@ export class BillingService {
 
     const keyId = this.config.get<string>("RAZORPAY_KEY_ID");
     const keySecret = this.config.get<string>("RAZORPAY_KEY_SECRET");
-    const webOrigin = firstWebOrigin(
+    const webOrigin = primaryWebOrigin(
       this.config.get<string>("CORS_ORIGIN") ?? "http://localhost:3000",
     );
 
@@ -486,8 +487,4 @@ export class BillingService {
     if (!roles.includes(m.role)) throw new ForbiddenException("owner_required");
     return m;
   }
-}
-
-function firstWebOrigin(corsOrigin: string): string {
-  return corsOrigin.split(",")[0]?.trim() || "http://localhost:3000";
 }
