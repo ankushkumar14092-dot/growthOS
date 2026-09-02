@@ -21,7 +21,7 @@ Or copy the folder `wordpress-plugin/ai-growth-os/` into `wp-content/plugins/`.
 
 ## 3. Connect from AI Growth OS
 
-1. Open [http://localhost:3000](http://localhost:3000) (or your deployed app)
+1. Open [https://grothos.in](https://grothos.in) (production) or [http://localhost:3000](http://localhost:3000) (local)
 2. Sign up → create workspace
 3. **Connect Website → WordPress**
 4. Domain / Base URL = your site (local staging: `http://localhost:8080`)

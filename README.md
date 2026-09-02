@@ -10,7 +10,7 @@ Connect a site → scan → approve AI proposals → deploy with verify/rollback
 
 | Surface | URL |
 |---------|-----|
-| Web app | https://grothos.vercel.app |
+| Web app | https://grothos.in (also https://www.grothos.in) |
 | API health | https://growthos-nbvo.onrender.com/health |
 | GitHub | https://github.com/ankushkumar14092-dot/growthOS |
 
@@ -35,7 +35,7 @@ Push to `main` auto-deploys **web → Vercel**. **API → Render** if the servic
 
 ## Do you need to do anything?
 
-**For day-to-day use of the live app:** you’re fine — open https://grothos.vercel.app, sign up / log in, connect a site, run a scan.
+**For day-to-day use of the live app:** open https://grothos.in, sign up / log in, connect a site, run a scan.
 
 **Only if you want full Razorpay test checkout in production**, finish these on the **Render** API service (Environment):
 
@@ -45,8 +45,10 @@ Push to `main` auto-deploys **web → Vercel**. **API → Render** if the servic
    `https://growthos-nbvo.onrender.com/billing/webhook`  
 4. Optional (recurring subscriptions): `RAZORPAY_PLAN_STARTER` / `RAZORPAY_PLAN_AGENCY`  
    Without plan IDs, upgrade opens a **Payment Link** (one-time test payment) instead.  
-5. `CORS_ORIGIN` must include `https://grothos.vercel.app` (comma-separate other aliases if needed).  
+5. `CORS_ORIGIN` must include `https://grothos.in,https://www.grothos.in` (comma-separate; keep `https://grothos.vercel.app` during transition if needed).  
 6. After changing env vars → **Manual Deploy** on Render (or wait for auto-deploy).
+
+**Google Search Console (grothos.in):** domain verified via DNS TXT · sitemap `sitemap.xml` submitted · homepage indexing requested. Check progress with `site:grothos.in` in Google after 1–2 weeks.
 
 **Local Razorpay:** put the same keys in `apps/api/.env` and restart `npm run dev:api`.
 
@@ -141,7 +143,7 @@ npm run plugin:zip     # wordpress-plugin/ai-growth-os.zip
 
 ---
 
-## Status (2026-08-22)
+## Status (2026-09-02)
 
 | Area | Status |
 |------|--------|
@@ -150,8 +152,10 @@ npm run plugin:zip     # wordpress-plugin/ai-growth-os.zip
 | Dedicated `/billing` + `/team` routes | Done |
 | Razorpay (test keys + Payment Link fallback) | Done in code — set keys on Render for prod |
 | Stripe | Removed / replaced by Razorpay |
-| Production web (Vercel) | Live |
-| Production API (Render) | Live — confirm env + latest deploy after pushes |
+| Production web (Vercel) | Live at **https://grothos.in** |
+| Custom domain (grothos.in) | Live — apex → www redirect on Vercel |
+| Google Search Console | Domain verified · sitemap submitted · indexing requested |
+| Production API (Render) | Live — set `CORS_ORIGIN` for grothos.in domains |
 
 **Not required for basic scanning:** OpenAI, Tavily, SERP, Razorpay plan IDs.
 
