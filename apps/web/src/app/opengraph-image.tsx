@@ -54,7 +54,7 @@ export default function OpenGraphImage() {
               maxWidth: 980,
             }}
           >
-            Your website's relentless growth engine
+            AI SEO fixes that never write without you
           </div>
           <div
             style={{
@@ -65,8 +65,8 @@ export default function OpenGraphImage() {
               lineHeight: 1.35,
             }}
           >
-            AI-powered SEO · AEO · GEO — scan, approve, deploy with verify &
-            rollback.
+            Scan SEO · AEO · GEO — approve before write, verify live HTML,
+            auto-rollback if it fails.
           </div>
         </div>
 

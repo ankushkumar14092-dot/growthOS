@@ -1533,6 +1533,62 @@ html.dark .app-alert--warn {
   color: var(--color-text-muted);
 }
 
+.land-proof {
+  display: grid;
+  gap: 0;
+}
+
+.land-proof-item {
+  padding: 24px 12px;
+  margin: 0 -12px;
+  border-top: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: background 0.2s ease;
+}
+
+.land-proof-item:last-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.land-proof-item:hover {
+  background: rgba(13, 148, 136, 0.05);
+}
+
+.land-proof-who {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-teal);
+}
+
+.land-proof-outcome {
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2.4vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--color-navy);
+}
+
+.land-proof-story {
+  margin: 10px 0 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.land-convert .land-h2 {
+  max-width: 22ch;
+}
+
+.land-convert .land-cta-row {
+  flex-wrap: wrap;
+}
+
 .land-next-steps {
   margin: 22px 0 0;
   padding-left: 18px;

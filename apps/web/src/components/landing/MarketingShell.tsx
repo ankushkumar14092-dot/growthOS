@@ -16,10 +16,11 @@ export function MarketingShell({
         <div className="land-top">
           <BrandMark variant="header" />
           <nav className="land-nav">
-            <a href="/#how">Product</a>
+            <a href="/#start">How to start</a>
+            <a href="/#demo">Demo</a>
             <a href="/pricing">Pricing</a>
             <a href="/compare">Compare</a>
-            <a href="/seo-aeo-geo">SEO · AEO · GEO</a>
+            <a href="/#trust">Trust</a>
             <a className="land-nav-login" href="/signup">
               Start free
             </a>

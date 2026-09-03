@@ -35,7 +35,7 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${BRAND_NAME} — AI SEO, AEO & GEO growth engine`,
+    default: `${BRAND_NAME} — AI SEO that never writes without you`,
     template: `%s | ${BRAND_NAME}`,
   },
   description: SITE_TAGLINE,
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: BRAND_NAME,
-    title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
+    title: `${BRAND_NAME} — AI SEO that never writes without you`,
     description: SITE_TAGLINE,
     url: siteUrl,
     images: [
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
+    title: `${BRAND_NAME} — AI SEO that never writes without you`,
     description: SITE_TAGLINE,
     images: ["/icon-512.png"],
   },
