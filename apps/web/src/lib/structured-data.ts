@@ -54,20 +54,28 @@ export function websiteJsonLd() {
 
 export function softwareApplicationJsonLd() {
   const site = getSiteUrl();
+  const logo = brandLogo();
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: BRAND_NAME,
     alternateName: [PRODUCT_NAME, "growthos"],
     applicationCategory: "BusinessApplication",
+    applicationSubCategory: "SEO",
     operatingSystem: "Web",
+    browserRequirements: "Requires JavaScript. Requires HTML5.",
     url: site,
-    image: brandLogo().url,
+    image: logo.url,
+    screenshot: logo.url,
     description: SITE_TAGLINE,
+    author: { "@id": `${site}/#organization` },
+    publisher: { "@id": `${site}/#organization` },
     offers: {
       "@type": "Offer",
       price: "0",
       priceCurrency: "INR",
+      availability: "https://schema.org/InStock",
+      url: `${site}/signup`,
       description: "Free beta plan with paid Starter and Agency tiers",
     },
   };
