@@ -5,12 +5,12 @@ import { BRAND_NAME, getSiteUrl, SITE_KEYWORDS, SITE_TAGLINE } from "@/lib/site"
 const site = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: `${BRAND_NAME} — AI SEO, AEO & GEO growth engine`,
+  title: `${BRAND_NAME} — AI SEO that never writes without you`,
   description: SITE_TAGLINE,
   keywords: SITE_KEYWORDS,
   alternates: { canonical: "/" },
   openGraph: {
-    title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
+    title: `${BRAND_NAME} — AI SEO that never writes without you`,
     description: SITE_TAGLINE,
     url: site,
     type: "website",
