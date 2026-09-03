@@ -6,20 +6,32 @@ import {
   getSiteUrl,
 } from "@/lib/site";
 
-function logoUrl() {
-  return `${getSiteUrl()}/logo.png`;
+/** Square mark for Google favicon / Organization logo (must be ≥112×112). */
+function brandLogo() {
+  const site = getSiteUrl();
+  return {
+    "@type": "ImageObject" as const,
+    url: `${site}/icon-512.png`,
+    contentUrl: `${site}/icon-512.png`,
+    width: 512,
+    height: 512,
+    caption: BRAND_NAME,
+  };
 }
 
 export function organizationJsonLd() {
   const site = getSiteUrl();
+  const logo = brandLogo();
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${site}/#organization`,
     name: BRAND_NAME,
+    legalName: BRAND_NAME,
     alternateName: [PRODUCT_NAME, "AI Growth OS", "growthos"],
     url: site,
-    logo: logoUrl(),
-    image: logoUrl(),
+    logo,
+    image: logo,
     description: SITE_TAGLINE,
     sameAs: [GITHUB_URL],
   };
@@ -30,17 +42,13 @@ export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${site}/#website`,
     name: BRAND_NAME,
-    alternateName: [PRODUCT_NAME, "growthos"],
+    alternateName: ["growthos", PRODUCT_NAME],
     url: site,
     description: SITE_TAGLINE,
     inLanguage: "en",
-    publisher: {
-      "@type": "Organization",
-      name: BRAND_NAME,
-      url: site,
-      logo: logoUrl(),
-    },
+    publisher: { "@id": `${site}/#organization` },
   };
 }
 
@@ -54,7 +62,7 @@ export function softwareApplicationJsonLd() {
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     url: site,
-    image: logoUrl(),
+    image: brandLogo().url,
     description: SITE_TAGLINE,
     offers: {
       "@type": "Offer",

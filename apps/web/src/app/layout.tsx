@@ -43,14 +43,15 @@ export const metadata: Metadata = {
   applicationName: BRAND_NAME,
   manifest: "/site.webmanifest",
   icons: {
+    // Google Search favicon: prefer square PNG multiples of 48px
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
       { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
       { url: "/icon-96.png", sizes: "96x96", type: "image/png" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon.ico", sizes: "48x48" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-    shortcut: ["/favicon.ico"],
+    shortcut: ["/icon-48.png"],
   },
   alternates: {
     canonical: "/",
@@ -61,11 +62,20 @@ export const metadata: Metadata = {
     title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
     description: SITE_TAGLINE,
     url: siteUrl,
+    images: [
+      {
+        url: "/icon-512.png",
+        width: 512,
+        height: 512,
+        alt: BRAND_NAME,
+      },
+    ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
     description: SITE_TAGLINE,
+    images: ["/icon-512.png"],
   },
   robots: {
     index: true,
