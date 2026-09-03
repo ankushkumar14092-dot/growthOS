@@ -7,8 +7,17 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/dashboard", "/onboarding", "/sites/", "/job-runs/", "/deployments/"],
+      disallow: [
+        "/dashboard",
+        "/onboarding",
+        "/sites/",
+        "/job-runs/",
+        "/deployments/",
+        "/billing",
+        "/team",
+      ],
     },
     sitemap: `${site}/sitemap.xml`,
+    host: site.replace(/^https?:\/\//, ""),
   };
 }

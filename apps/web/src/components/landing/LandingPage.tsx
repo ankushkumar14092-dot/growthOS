@@ -77,7 +77,8 @@ export function LandingPage({
           <BrandMark variant="header" />
           <nav className="land-nav">
             <a href="#how">Product</a>
-            <a href="#trust">Trust</a>
+            <a href="/pricing">Pricing</a>
+            <a href="/seo-aeo-geo">SEO · AEO · GEO</a>
             <a href="#beta">Beta</a>
             <a className="land-nav-login" href="/login">
               Login
@@ -310,6 +311,8 @@ export function LandingPage({
         <BrandMark variant="header" />
         <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           <a href="/#how">Product</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/seo-aeo-geo">SEO · AEO · GEO</a>
           <a href="/#faq">FAQ</a>
           <a href="/signup">Signup</a>
           <a href="/login">Login</a>

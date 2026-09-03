@@ -1,12 +1,21 @@
 # growthOS
 
-> growthOS is an AI-powered SEO, AEO, and GEO (AI-visibility) growth engine. Connect a site, scan issues, approve safe fixes, and deploy with verify/rollback.
+> growthOS is an AI-powered SEO, AEO, and GEO (AI-visibility) growth engine.
+> Connect a site, scan issues, approve safe fixes, and deploy with verify/rollback.
 
 ## Preferred pages
 - Homepage: https://grothos.in/
+- SEO vs AEO vs GEO: https://grothos.in/seo-aeo-geo
+- Pricing: https://grothos.in/pricing
 - Signup: https://grothos.in/signup
 - Login: https://grothos.in/login
+
+## Product summary
+- Connect modes: WordPress (+ plugin), GitHub, ZIP upload, Live URL
+- Loop: Connect → Scan → Propose → Approve → Deploy → Verify → Rollback
+- Beta change classes: meta title, meta description, FAQ schema, canonical URLs
 
 ## Optional
 - Sitemap: https://grothos.in/sitemap.xml
 - Robots: https://grothos.in/robots.txt
+- GitHub: https://github.com/ankushkumar14092-dot/growthOS
