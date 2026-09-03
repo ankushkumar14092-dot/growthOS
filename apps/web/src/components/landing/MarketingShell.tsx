@@ -18,6 +18,7 @@ export function MarketingShell({
           <nav className="land-nav">
             <a href="/#how">Product</a>
             <a href="/pricing">Pricing</a>
+            <a href="/compare">Compare</a>
             <a href="/seo-aeo-geo">SEO · AEO · GEO</a>
             <a className="land-nav-login" href="/signup">
               Start free
@@ -31,6 +32,7 @@ export function MarketingShell({
         <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           <a href="/#how">Product</a>
           <a href="/pricing">Pricing</a>
+          <a href="/compare">Compare</a>
           <a href="/seo-aeo-geo">SEO · AEO · GEO</a>
           <a href="/#faq">FAQ</a>
           <a href="/signup">Signup</a>

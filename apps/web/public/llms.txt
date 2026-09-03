@@ -6,6 +6,7 @@
 ## Preferred pages
 - Homepage: https://grothos.in/
 - SEO vs AEO vs GEO: https://grothos.in/seo-aeo-geo
+- Compare vs SEO tools: https://grothos.in/compare
 - Pricing: https://grothos.in/pricing
 - Signup: https://grothos.in/signup
 - Login: https://grothos.in/login

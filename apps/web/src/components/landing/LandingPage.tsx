@@ -86,6 +86,7 @@ export function LandingPage({
           <nav className="land-nav">
             <a href="#how">Product</a>
             <a href="/pricing">Pricing</a>
+            <a href="/compare">Compare</a>
             <a href="/seo-aeo-geo">SEO · AEO · GEO</a>
             <a href="#beta">Beta</a>
             <a className="land-nav-login" href="/signup">
@@ -202,6 +203,51 @@ export function LandingPage({
             </div>
           ))}
         </div>
+      </section>
+
+      <section id="wedge" className="land-section">
+        <p className="land-kicker">Why buy growthOS</p>
+        <h2 className="land-h2">What&apos;s new vs tools you already know</h2>
+        <p className="land-lead">
+          Ahrefs finds issues. Yoast helps you edit WordPress. Many AI SEO tools
+          write too freely. <BrandText /> is the missing middle: approve → deploy →
+          verify → rollback across SEO · AEO · GEO.
+        </p>
+        <div className="land-flow" style={{ marginTop: 40 }}>
+          {[
+            [
+              "01",
+              "vs Ahrefs / Semrush",
+              "They research. We execute approved on-site fixes with an audit trail.",
+            ],
+            [
+              "02",
+              "vs Yoast / Rank Math",
+              "They help manual edits inside WP. We scan and propose, then write only after you approve.",
+            ],
+            [
+              "03",
+              "vs Alli-style AI SEO",
+              "We prioritize live HTML verification + rollback and work beyond WordPress (GitHub / ZIP / Live URL).",
+            ],
+            [
+              "04",
+              "Our wedge",
+              "Hosted Mission Control + multi-connect + trust loop you can show a client.",
+            ],
+          ].map(([n, t, d]) => (
+            <div key={n} className="land-flow-item">
+              <div className="land-flow-num">{n}</div>
+              <div>
+                <strong>{t}</strong>
+                <span>{d}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p style={{ marginTop: 20 }}>
+          <a href="/compare">Full comparison table →</a>
+        </p>
       </section>
 
       <section id="trust" className="land-section">
@@ -358,6 +404,7 @@ export function LandingPage({
         <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           <a href="/#how">Product</a>
           <a href="/pricing">Pricing</a>
+          <a href="/compare">Compare</a>
           <a href="/seo-aeo-geo">SEO · AEO · GEO</a>
           <a href="/#faq">FAQ</a>
           <a href="/signup">Signup</a>
