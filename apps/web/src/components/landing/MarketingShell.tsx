@@ -19,8 +19,8 @@ export function MarketingShell({
             <a href="/#how">Product</a>
             <a href="/pricing">Pricing</a>
             <a href="/seo-aeo-geo">SEO · AEO · GEO</a>
-            <a className="land-nav-login" href="/login">
-              Login
+            <a className="land-nav-login" href="/signup">
+              Start free
             </a>
           </nav>
         </div>

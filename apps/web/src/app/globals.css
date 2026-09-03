@@ -1487,9 +1487,185 @@ html.dark .app-alert--warn {
   color: var(--land-ink, var(--color-navy));
 }
 
-.land-footer-note .brand-text-os {
-  color: #0d9488;
+.land-hero-trust {
+  margin: 18px 0 0;
+  max-width: 42ch;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  animation: land-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
 }
+
+.land-audience {
+  display: grid;
+  gap: 0;
+}
+
+.land-audience-item {
+  padding: 20px 12px;
+  margin: 0 -12px;
+  border-top: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: background 0.2s ease;
+}
+
+.land-audience-item:last-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.land-audience-item:hover {
+  background: rgba(13, 148, 136, 0.06);
+}
+
+.land-audience-item strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-navy);
+  margin-bottom: 6px;
+}
+
+.land-audience-item span {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.land-next-steps {
+  margin: 22px 0 0;
+  padding-left: 18px;
+  max-width: 44ch;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.land-next-steps li + li {
+  margin-top: 8px;
+}
+
+.land-form-footnote {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.land-form-footnote a {
+  color: var(--color-navy);
+  font-weight: 600;
+}
+
+.land-plan-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .land-plan-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    align-items: stretch;
+  }
+}
+
+.land-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface);
+}
+
+.land-plan.is-featured {
+  border-color: rgba(13, 148, 136, 0.45);
+  box-shadow: 0 10px 36px rgba(13, 148, 136, 0.1);
+}
+
+.land-plan-badge {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-teal);
+}
+
+.land-plan-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-navy);
+}
+
+.land-plan-price {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.land-plan-price span {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-navy);
+}
+
+.land-plan-price small {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.land-plan-blurb {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.land-plan-features {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  flex: 1;
+}
+
+.land-plan-features li {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 10px;
+  align-items: start;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.land-plan-features li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--color-teal);
+}
+
+.land-plan .land-btn-primary,
+.land-plan .land-btn-ghost {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
+
 
 @media (max-width: 800px) {
   .land-timeline {
