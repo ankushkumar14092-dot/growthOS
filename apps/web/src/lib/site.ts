@@ -21,7 +21,7 @@ export const PRODUCT_NAME = "AI-Growth-OS";
 export const SITE_NAME = BRAND_NAME;
 export const SITE_DISPLAY = BRAND_NAME;
 export const SITE_TAGLINE =
-  "growthOS scans SEO · AEO · GEO issues and only writes after you approve — then verifies live HTML and rolls back if something breaks.";
+  "growthOS is your AI-powered SEO, AEO & GEO growth engine — connect any site, scan issues, approve safe fixes, deploy with verify & rollback.";
 export const SITE_KEYWORDS = [
   "growthOS",
   "growthos",
