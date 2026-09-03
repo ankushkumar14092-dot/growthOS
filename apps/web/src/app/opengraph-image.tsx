@@ -1,18 +1,12 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const alt = "growthOS — AI SEO, AEO & GEO growth engine";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default async function OpenGraphImage() {
-  const logoBytes = await readFile(
-    join(process.cwd(), "public", "icon-512.png"),
-  );
-  const logoSrc = `data:image/png;base64,${logoBytes.toString("base64")}`;
-
+/** Share card — matches the previous branded preview with the growthOS mark. */
+export default function OpenGraphImage() {
   return new ImageResponse(
     (
       <div
@@ -22,36 +16,31 @@ export default async function OpenGraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "56px 64px",
+          padding: "64px 72px",
           background:
             "linear-gradient(145deg, #0b1220 0%, #0f2744 55%, #0d9488 160%)",
           color: "#f8fafc",
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <div
             style={{
-              width: 88,
-              height: 88,
-              borderRadius: 22,
-              background: "#ffffff",
+              width: 72,
+              height: 72,
+              borderRadius: 18,
+              background: "#0066ff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              overflow: "hidden",
+              fontSize: 36,
+              fontWeight: 800,
+              color: "#ffffff",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={logoSrc}
-              width={72}
-              height={72}
-              alt=""
-              style={{ objectFit: "contain" }}
-            />
+            g
           </div>
-          <div style={{ display: "flex", fontSize: 42, fontWeight: 700 }}>
+          <div style={{ display: "flex", fontSize: 40, fontWeight: 700 }}>
             <span style={{ color: "#e2e8f0" }}>growth</span>
             <span style={{ color: "#5eead4" }}>OS</span>
           </div>
