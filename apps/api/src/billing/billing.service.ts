@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MembershipRole, PlanTier } from "@prisma/client";
+import { PLAN_LIMITS as SHARED_PLAN_LIMITS } from "@ai-growth-os/shared";
 import { createHmac, timingSafeEqual } from "crypto";
 import { PrismaService } from "../prisma/prisma.service";
 import { primaryWebOrigin } from "../cors-origins";
@@ -16,9 +17,24 @@ const PLAN_LIMITS: Record<
   PlanTier,
   { sites: number; scansPerMonth: number; label: string; priceLabel: string }
 > = {
-  free: { sites: 2, scansPerMonth: 20, label: "Free", priceLabel: "₹0" },
-  starter: { sites: 10, scansPerMonth: 200, label: "Starter", priceLabel: "₹3,999/mo" },
-  agency: { sites: 50, scansPerMonth: 2000, label: "Agency", priceLabel: "₹15,999/mo" },
+  free: {
+    sites: SHARED_PLAN_LIMITS.free.sites,
+    scansPerMonth: SHARED_PLAN_LIMITS.free.scansPerMonth,
+    label: SHARED_PLAN_LIMITS.free.label,
+    priceLabel: SHARED_PLAN_LIMITS.free.priceLabel,
+  },
+  starter: {
+    sites: SHARED_PLAN_LIMITS.starter.sites,
+    scansPerMonth: SHARED_PLAN_LIMITS.starter.scansPerMonth,
+    label: SHARED_PLAN_LIMITS.starter.label,
+    priceLabel: SHARED_PLAN_LIMITS.starter.priceLabel,
+  },
+  agency: {
+    sites: SHARED_PLAN_LIMITS.agency.sites,
+    scansPerMonth: SHARED_PLAN_LIMITS.agency.scansPerMonth,
+    label: SHARED_PLAN_LIMITS.agency.label,
+    priceLabel: SHARED_PLAN_LIMITS.agency.priceLabel,
+  },
 };
 
 @Injectable()

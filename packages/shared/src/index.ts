@@ -34,6 +34,34 @@ export type MembershipRole = "owner" | "member";
 
 export type PlanTier = "free" | "starter" | "agency";
 
+/** Canonical plan caps — keep web pricing + API billing in sync */
+export const PLAN_LIMITS: Record<
+  PlanTier,
+  { sites: number; scansPerMonth: number; label: string; priceInr: number; priceLabel: string }
+> = {
+  free: {
+    sites: 2,
+    scansPerMonth: 20,
+    label: "Free",
+    priceInr: 0,
+    priceLabel: "₹0",
+  },
+  starter: {
+    sites: 10,
+    scansPerMonth: 200,
+    label: "Starter",
+    priceInr: 3999,
+    priceLabel: "₹3,999/mo",
+  },
+  agency: {
+    sites: 50,
+    scansPerMonth: 2000,
+    label: "Agency",
+    priceInr: 15999,
+    priceLabel: "₹15,999/mo",
+  },
+};
+
 /** MVP connection methods — platform-agnostic connect layer */
 export type ConnectionType = "wordpress" | "github" | "zip" | "url_audit";
 

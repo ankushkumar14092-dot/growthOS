@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PLAN_LIMITS } from "@ai-growth-os/shared";
 import { MarketingShell } from "@/components/landing/MarketingShell";
 import { BrandText } from "@/components/BrandText";
 import { BRAND_NAME, getSiteUrl } from "@/lib/site";
@@ -7,12 +8,12 @@ const site = getSiteUrl();
 
 export const metadata: Metadata = {
   title: `Pricing — ${BRAND_NAME}`,
-  description: `${BRAND_NAME} pricing: Free beta (2 sites), Starter ₹3,999/mo, Agency ₹15,999/mo. Approve SEO/AEO/GEO fixes before write, with verify & rollback.`,
+  description: `${BRAND_NAME} pricing: Free (2 sites / 20 scans), Starter ₹3,999/mo (10 sites / 200 scans), Agency ₹15,999/mo (50 sites / 2,000 scans). Approve before write, verify & rollback.`,
   alternates: { canonical: "/pricing" },
   openGraph: {
     title: `${BRAND_NAME} pricing`,
     description:
-      "Start free. Upgrade when you need more sites and scans — built for agencies and founders who ship safe on-site changes.",
+      "Exact limits: Free 2 sites / 20 scans · Starter 10 / 200 · Agency 50 / 2,000. Start free, upgrade when caps hurt.",
     url: `${site}/pricing`,
     type: "website",
   },
@@ -20,14 +21,10 @@ export const metadata: Metadata = {
 
 const PLANS = [
   {
-    name: "Free",
-    price: "₹0",
-    period: "private beta",
+    id: "free" as const,
     highlight: false,
     blurb: "Prove the loop on your own sites.",
-    features: [
-      "2 sites",
-      "Capped monthly scans",
+    extras: [
       "SEO · AEO · GEO issue scan",
       "Approve before write",
       "WordPress verify & rollback",
@@ -35,14 +32,10 @@ const PLANS = [
     cta: { href: "/signup", label: "Start free" },
   },
   {
-    name: "Starter",
-    price: "₹3,999",
-    period: "/ month",
+    id: "starter" as const,
     highlight: true,
     blurb: "For growing teams shipping fixes weekly.",
-    features: [
-      "Higher site limits",
-      "Higher monthly scans",
+    extras: [
       "Mission Timeline for clients",
       "GitHub PR + ZIP fix packs",
       "Priority beta support",
@@ -50,14 +43,10 @@ const PLANS = [
     cta: { href: "/signup", label: "Start with Free, upgrade later" },
   },
   {
-    name: "Agency",
-    price: "₹15,999",
-    period: "/ month",
+    id: "agency" as const,
     highlight: false,
     blurb: "Multi-client workspaces at agency scale.",
-    features: [
-      "Agency-scale site caps",
-      "High scan volume",
+    extras: [
       "Team seats (workspace)",
       "Client-ready audit trail",
       "Best for WP portfolios",
@@ -73,47 +62,79 @@ export default function PricingPage() {
         <p className="land-kicker">Pricing</p>
         <h1 className="land-h2">Pay for execution, not another report</h1>
         <p className="land-lead">
-          <BrandText /> is priced for teams who connect a site, approve fixes, and
-          ship — with verify &amp; rollback where it matters.
+          Exact site and scan caps from the product — same numbers the API enforces.
         </p>
 
         <div className="land-plan-grid" style={{ marginTop: 40 }}>
-          {PLANS.map((plan) => (
-            <article
-              key={plan.name}
-              className={`land-plan${plan.highlight ? " is-featured" : ""}`}
-            >
-              {plan.highlight ? (
-                <p className="land-plan-badge">Most teams start here</p>
-              ) : null}
-              <h2 className="land-plan-name">{plan.name}</h2>
-              <p className="land-plan-price">
-                <span>{plan.price}</span>
-                <small>{plan.period}</small>
-              </p>
-              <p className="land-plan-blurb">{plan.blurb}</p>
-              <ul className="land-plan-features">
-                {plan.features.map((f) => (
-                  <li key={f}>{f}</li>
-                ))}
-              </ul>
-              <a
-                className={
-                  plan.highlight ? "land-btn-primary" : "land-btn-ghost"
-                }
-                href={plan.cta.href}
-                style={{ marginTop: 8, justifyContent: "center" }}
+          {PLANS.map((plan) => {
+            const limits = PLAN_LIMITS[plan.id];
+            return (
+              <article
+                key={plan.id}
+                className={`land-plan${plan.highlight ? " is-featured" : ""}`}
               >
-                <span>{plan.cta.label}</span>
-              </a>
-            </article>
-          ))}
+                {plan.highlight ? (
+                  <p className="land-plan-badge">Most teams start here</p>
+                ) : null}
+                <h2 className="land-plan-name">{limits.label}</h2>
+                <p className="land-plan-price">
+                  <span>
+                    {plan.id === "free"
+                      ? "₹0"
+                      : `₹${limits.priceInr.toLocaleString("en-IN")}`}
+                  </span>
+                  <small>{plan.id === "free" ? "private beta" : "/ month"}</small>
+                </p>
+                <p className="land-plan-blurb">{plan.blurb}</p>
+                <ul className="land-plan-features">
+                  <li>
+                    <strong>{limits.sites} sites</strong>
+                  </li>
+                  <li>
+                    <strong>
+                      {limits.scansPerMonth.toLocaleString("en-IN")} scans / month
+                    </strong>
+                  </li>
+                  {plan.extras.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+                <a
+                  className={
+                    plan.highlight ? "land-btn-primary" : "land-btn-ghost"
+                  }
+                  href={plan.cta.href}
+                  style={{ marginTop: 8, justifyContent: "center" }}
+                >
+                  <span>{plan.cta.label}</span>
+                </a>
+              </article>
+            );
+          })}
         </div>
 
-        <p className="land-lead" style={{ marginTop: 40 }}>
-          Honest beta note: paid checkout is available when Razorpay keys are set.
-          Until then, Free gets you into the product loop. Limits may tighten as we
-          learn from real usage.
+        <div className="land-section" style={{ paddingLeft: 0, paddingRight: 0 }}>
+          <p className="land-kicker">60-second demo</p>
+          <h2 className="land-h2">See the trust loop</h2>
+          <p className="land-lead">
+            Connect → scan → approve → deploy → verify → rollback.
+          </p>
+          <video
+            className="land-demo-video"
+            controls
+            playsInline
+            preload="metadata"
+            poster="/demo/growthos-loop-poster.jpg"
+          >
+            <source src="/demo/growthos-loop.mp4" type="video/mp4" />
+            Your browser does not support the video tag.{" "}
+            <a href="/demo/growthos-loop.mp4">Download the demo</a>.
+          </video>
+        </div>
+
+        <p className="land-lead" style={{ marginTop: 24 }}>
+          Honest beta note: paid checkout opens when Razorpay keys are set. Until
+          then, Free gets you into the product loop.
         </p>
 
         <div style={{ marginTop: 56 }}>
@@ -130,8 +151,8 @@ export default function PricingPage() {
           <a className="land-btn-primary" href="/signup">
             <span>Create free account</span>
           </a>
-          <a className="land-btn-ghost" href="/seo-aeo-geo">
-            Understand SEO · AEO · GEO
+          <a className="land-btn-ghost" href="/compare">
+            Compare vs SEO tools
           </a>
         </div>
       </section>

@@ -282,15 +282,15 @@ export function LandingPage({
 
       <section className="land-section">
         <p className="land-kicker">Pricing</p>
-        <h2 className="land-h2">Simple plans. Start free.</h2>
+        <h2 className="land-h2">Simple plans. Exact limits.</h2>
         <p className="land-lead">
           Free for private beta. Upgrade when site and scan limits need to grow.
         </p>
         <div className="land-price-row">
           {[
-            ["Free", "₹0 · 2 sites"],
-            ["Starter", "₹3,999 / month"],
-            ["Agency", "₹15,999 / month"],
+            ["Free", "₹0 · 2 sites · 20 scans/mo"],
+            ["Starter", "₹3,999/mo · 10 sites · 200 scans"],
+            ["Agency", "₹15,999/mo · 50 sites · 2,000 scans"],
           ].map(([plan, price]) => (
             <div key={plan} className="land-price-item">
               <strong>{plan}</strong>
@@ -301,6 +301,23 @@ export function LandingPage({
         <p style={{ marginTop: 20 }}>
           <a href="/pricing">Compare plans →</a>
         </p>
+      </section>
+
+      <section className="land-section" id="demo">
+        <p className="land-kicker">Demo</p>
+        <h2 className="land-h2">60 seconds: the trust loop</h2>
+        <p className="land-lead">
+          What buyers need to see before they pay — approve, verify, rollback.
+        </p>
+        <video
+          className="land-demo-video"
+          controls
+          playsInline
+          preload="metadata"
+          poster="/demo/growthos-loop-poster.jpg"
+        >
+          <source src="/demo/growthos-loop.mp4" type="video/mp4" />
+        </video>
       </section>
 
       <section id="beta" className="land-section land-beta">

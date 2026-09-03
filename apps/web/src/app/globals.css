@@ -1666,6 +1666,17 @@ html.dark .app-alert--warn {
   text-decoration: none;
 }
 
+.land-demo-video {
+  display: block;
+  width: 100%;
+  max-width: 880px;
+  margin-top: 28px;
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  background: #0b1220;
+  aspect-ratio: 16 / 9;
+}
+
 .land-compare-wrap {
   overflow-x: auto;
   border: 1px solid var(--color-border);
