@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Plus_Jakarta_Sans } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { WebSentry } from "@/components/WebSentry";
 import {
   organizationJsonLd,
@@ -14,15 +14,20 @@ import {
 } from "@/lib/site";
 import "./globals.css";
 
+/** UI / body */
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans-loaded",
-  weight: ["400", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   adjustFontFallback: true,
 });
 
-const display = Instrument_Sans({
+/**
+ * Display — Fraunces soft optical sizes.
+ * Serif display + sans UI is a classic designer pairing (not default SaaS AI).
+ */
+const display = Fraunces({
   subsets: ["latin"],
   variable: "--font-display-loaded",
   weight: ["500", "600", "700"],
@@ -35,7 +40,7 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${BRAND_NAME} — AI SEO, AEO & GEO growth engine`,
+    default: `${BRAND_NAME} — AI SEO, AEO & GEO Growth Engine`,
     template: `%s | ${BRAND_NAME}`,
   },
   description: SITE_TAGLINE,
@@ -43,15 +48,15 @@ export const metadata: Metadata = {
   applicationName: BRAND_NAME,
   manifest: "/site.webmanifest",
   icons: {
-    // Google Search favicon: prefer square PNG multiples of 48px
     icon: [
+      { url: "/logo.png", type: "image/png" },
       { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
       { url: "/icon-96.png", sizes: "96x96", type: "image/png" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/favicon.ico", sizes: "48x48" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-    shortcut: ["/icon-48.png"],
+    shortcut: ["/logo.png"],
   },
   alternates: {
     canonical: "/",
@@ -59,12 +64,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: BRAND_NAME,
-    title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
+    title: `${BRAND_NAME} — AI SEO, AEO & GEO Growth Engine`,
     description: SITE_TAGLINE,
-    url: siteUrl,
+    url: `${siteUrl}/`,
+    locale: "en_IN",
     images: [
       {
-        url: "/opengraph-image",
+        url: "/opengraph-image?v=logo-hero",
         width: 1200,
         height: 630,
         alt: `${BRAND_NAME} logo`,
@@ -73,9 +79,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${BRAND_NAME} — AI-powered SEO, AEO & GEO growth`,
+    title: `${BRAND_NAME} — AI SEO, AEO & GEO Growth Engine`,
     description: SITE_TAGLINE,
-    images: ["/twitter-image"],
+    images: ["/opengraph-image?v=logo-hero"],
   },
   robots: {
     index: true,

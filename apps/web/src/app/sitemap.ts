@@ -13,6 +13,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${site}/ai-visibility`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: `${site}/compare`,
       lastModified,
       changeFrequency: "monthly",
@@ -23,18 +29,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.8,
-    },
-    {
-      url: `${site}/signup`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${site}/login`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.5,
     },
   ];
 }

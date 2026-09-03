@@ -13,7 +13,9 @@ export function getSiteUrl(): string {
 }
 
 /** Primary brand name — use everywhere in UI, SEO, and billing */
-export const BRAND_NAME = "growthOS";
+export const BRAND_NAME = "GrowthOS";
+/** Optional alternate strings (avoid “grothos” to keep entity clarity). */
+export const BRAND_ALIASES = ["GrowthOS"] as const;
 /** @deprecated Use BRAND_NAME */
 export const SEARCH_DISPLAY_NAME = BRAND_NAME;
 /** Product codename / legacy name */
@@ -21,17 +23,25 @@ export const PRODUCT_NAME = "AI-Growth-OS";
 export const SITE_NAME = BRAND_NAME;
 export const SITE_DISPLAY = BRAND_NAME;
 export const SITE_TAGLINE =
-  "growthOS is your AI-powered SEO, AEO & GEO growth engine — connect any site, scan issues, approve safe fixes, deploy with verify & rollback.";
+  "GrowthOS is an AI-powered SEO, AEO and GEO growth engine. Connect your website, scan issues, approve safe fixes, and deploy with verification and rollback.";
 export const SITE_KEYWORDS = [
-  "growthOS",
-  "growthos",
-  "AI-Growth-OS",
-  "SEO tool",
+  "GrowthOS",
+  "AI SEO",
+  "AI-powered SEO",
+  "SEO automation",
+  "technical SEO",
   "AEO",
+  "Answer Engine Optimization",
   "GEO",
+  "Generative Engine Optimization",
   "AI visibility",
+  "AI search optimization",
+  "SEO audit",
+  "SEO verification",
+  "SEO rollback",
   "WordPress SEO",
-  "website growth",
+  "LLM visibility",
+  "website SEO auditing",
 ];
 
 export const GITHUB_URL =

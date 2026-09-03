@@ -8,12 +8,12 @@ const site = getSiteUrl();
 export const metadata: Metadata = {
   title: `${BRAND_NAME} vs Ahrefs vs Yoast vs Alli AI`,
   description:
-    "Compare growthOS to Ahrefs, Yoast/Rank Math, and Alli-style AI SEO tools. Research vs plugins vs a hosted approve → deploy → verify → rollback loop for SEO, AEO, and GEO.",
+    "Compare GrowthOS to Ahrefs, Yoast/Rank Math, and Alli-style AI SEO tools. Research vs plugins vs a hosted approve → deploy → verify → rollback loop for SEO, AEO, and GEO.",
   alternates: { canonical: "/compare" },
   openGraph: {
     title: `${BRAND_NAME} vs SEO tools`,
     description:
-      "Why teams buy growthOS: multi-connect scan + human approval + live HTML verify + rollback — not another report or unsupervised AI write.",
+      "Why teams buy GrowthOS: multi-connect scan + human approval + live HTML verify + rollback — not another report or unsupervised AI write.",
     url: `${site}/compare`,
     type: "article",
   },
@@ -74,7 +74,7 @@ const ROWS = [
 const BUY_REASONS = [
   {
     title: "You already have research tools",
-    body: "Ahrefs/Semrush tell you what to fix. growthOS is the execution layer that ships title, meta, FAQ schema, and canonicals with approval.",
+    body: "Ahrefs/Semrush tell you what to fix. GrowthOS is the execution layer that ships title, meta, FAQ schema, and canonicals with approval.",
   },
   {
     title: "You fear unsupervised AI writes",
@@ -82,7 +82,7 @@ const BUY_REASONS = [
   },
   {
     title: "Your stack isn’t only WordPress",
-    body: "Plugin-only tools stop at WP. growthOS also opens GitHub PRs, packs ZIP fixes, and guides Live URL applies.",
+    body: "Plugin-only tools stop at WP. GrowthOS also opens GitHub PRs, packs ZIP fixes, and guides Live URL applies.",
   },
 ] as const;
 
@@ -103,7 +103,7 @@ export default function ComparePage() {
             <thead>
               <tr>
                 <th scope="col">Capability</th>
-                <th scope="col">growthOS</th>
+                <th scope="col">GrowthOS</th>
                 <th scope="col">Ahrefs / Semrush</th>
                 <th scope="col">Yoast / Rank Math</th>
                 <th scope="col">Alli-style AI SEO</th>

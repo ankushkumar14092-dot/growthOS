@@ -1,5 +1,5 @@
-import { BrandText } from "@/components/BrandText";
 import { BrandMark } from "./BrandMark";
+import { MarketingFooter } from "./MarketingFooter";
 import { VisitorTracker } from "./VisitorTracker";
 
 export function MarketingShell({
@@ -16,11 +16,11 @@ export function MarketingShell({
         <div className="land-top">
           <BrandMark variant="header" />
           <nav className="land-nav">
-            <a href="/#start">How to start</a>
+            <a href="/#start">Product</a>
             <a href="/#demo">Demo</a>
+            <a href="/ai-visibility">AI visibility</a>
             <a href="/pricing">Pricing</a>
             <a href="/compare">Compare</a>
-            <a href="/#trust">Trust</a>
             <a className="land-nav-login" href="/signup">
               Start free
             </a>
@@ -28,23 +28,7 @@ export function MarketingShell({
         </div>
       </header>
       {children}
-      <footer className="land-footer">
-        <BrandMark variant="header" />
-        <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-          <a href="/#how">Product</a>
-          <a href="/pricing">Pricing</a>
-          <a href="/compare">Compare</a>
-          <a href="/seo-aeo-geo">SEO · AEO · GEO</a>
-          <a href="/#faq">FAQ</a>
-          <a href="/signup">Signup</a>
-          <a href="/login">Login</a>
-          <a href="/llms.txt">llms.txt</a>
-          <a href="/sitemap.xml">Sitemap</a>
-        </nav>
-        <span className="land-footer-note">
-          <BrandText /> private beta · Multi-connect scan · Multi-mode deploy
-        </span>
-      </footer>
+      <MarketingFooter />
     </main>
   );
 }

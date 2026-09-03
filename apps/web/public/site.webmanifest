@@ -1,6 +1,6 @@
 {
-  "name": "growthOS",
-  "short_name": "growthOS",
+  "name": "GrowthOS",
+  "short_name": "GrowthOS",
   "description": "AI-powered SEO, AEO & GEO growth engine",
   "start_url": "/",
   "display": "standalone",

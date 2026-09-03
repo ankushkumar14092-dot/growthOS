@@ -2,27 +2,24 @@ import Image from "next/image";
 import { BrandText } from "@/components/BrandText";
 
 type Props = {
-  /** Compact nav · hero eyebrow · larger hero lockup */
   variant?: "header" | "hero";
-  /** Wrap in link to home — omit on hero when brand sits in the h1 */
   href?: string | null;
 };
 
+/** Original GrowthOS mark in a circular badge. */
 export function BrandMark({ variant = "header", href = "/" }: Props) {
   const isHero = variant === "hero";
-  const iconSize = isHero ? 28 : 24;
 
   const content = (
     <>
       <span
         className={`land-logo-mark${isHero ? " land-logo-mark--hero" : ""}`}
-        aria-hidden
       >
         <Image
-          src="/icon-48.png"
-          alt=""
-          width={iconSize}
-          height={iconSize}
+          src="/logo-mark.png"
+          alt="GrowthOS logo"
+          width={466}
+          height={338}
           priority={isHero}
         />
       </span>

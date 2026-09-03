@@ -1,100 +1,111 @@
+import Image from "next/image";
+import { PLAN_LIMITS } from "@ai-growth-os/shared";
 import { BRAND_NAME } from "@/lib/site";
 import { submitBetaWaitlist } from "@/app/actions/waitlist";
 import { BrandText } from "@/components/BrandText";
 import { BrandMark } from "./BrandMark";
+import { MarketingFooter } from "./MarketingFooter";
 import { VisitorTracker } from "./VisitorTracker";
 
-const STEPS = [
+const PRODUCT_LOOP = [
   { title: "Connect", meta: "Any site" },
   { title: "Scan", meta: "Issues found" },
   { title: "Propose", meta: "AI diff" },
   { title: "Approve", meta: "You decide" },
-  { title: "Deploy", meta: "Verify live", live: true },
+  { title: "Deploy", meta: "Verify live", plain: true },
   { title: "Rollback", meta: "If needed" },
-];
+] as const;
 
 const FIRST_RUN = [
   {
     n: "01",
     title: "Create a free account",
-    body: "No credit card. You land in Mission Control with a Free plan (2 sites · 20 scans).",
+    body: "No card. Free plan: 2 sites · 20 scans.",
   },
   {
     n: "02",
     title: "Connect one site",
-    body: "WordPress plugin, GitHub repo, ZIP upload, or a live URL — pick whatever you already have.",
+    body: "WordPress, GitHub, ZIP, or live URL.",
   },
   {
     n: "03",
     title: "Run a scan",
-    body: "We crawl capped pages and turn SEO · AEO · GEO gaps into concrete proposals with before/after.",
+    body: "SEO · AEO · GEO gaps become before/after proposals.",
   },
   {
     n: "04",
     title: "Approve one safe fix",
-    body: "Nothing writes until you say yes. On WordPress we backup, deploy, verify live HTML, and roll back if verify fails.",
-  },
-] as const;
-
-const TRUST_PROTOCOL = [
-  {
-    title: "Human gate",
-    body: "Every write waits for your approval. No silent AI publishes.",
-  },
-  {
-    title: "Backup first",
-    body: "Before a live WordPress write, we store the previous state for rollback.",
-  },
-  {
-    title: "Verify live HTML",
-    body: "After deploy we fetch the page and check the change actually landed — we never assume success.",
-  },
-  {
-    title: "Auto-rollback",
-    body: "If verification fails, we restore the backup automatically and leave an audit trail.",
+    body: "We backup, write, verify live HTML, and roll back if verify fails.",
   },
 ] as const;
 
 const PILOT_PROOF = [
   {
-    who: "Agency · WordPress portfolio",
+    who: "Agency · WordPress",
     outcome: "Client-ready audit trail",
     story:
-      "Connect a client WP site, scan for missing titles/FAQ schema, approve one meta fix, show Mission Timeline: backup → live write → HTML verify. Rollback stays one click away if something looks wrong.",
+      "Scan a client site, approve one meta fix, show Mission Timeline: backup → live write → HTML verify.",
+    rail: ["Scan", "Approve", "Verify", "Done"],
+    active: 2,
   },
   {
     who: "Founder · content site",
-    outcome: "Ship FAQ schema without a retainer",
+    outcome: "FAQ schema without a retainer",
     story:
-      "URL or ZIP connect, scan for answer-engine gaps, approve FAQ JSON-LD proposals, export or deploy per mode. You see the exact before/after — not another 40-page PDF.",
+      "Connect URL or ZIP, approve FAQ JSON-LD, ship the change — not another 40-page PDF.",
+    rail: ["Connect", "Scan", "Approve", "Ship"],
+    active: 3,
   },
   {
-    who: "Product team · GitHub / Next.js",
-    outcome: "PR instead of blind CMS write",
+    who: "Team · GitHub / Next.js",
+    outcome: "PR instead of blind write",
     story:
-      "Connect the repo, scan marketing pages, approve proposals, open a PR with the patch. Same approve gate — different deploy mode — so eng stays in the loop.",
+      "Same approve gate, different mode: open a PR so eng stays in the loop.",
+    rail: ["Scan", "Approve", "PR open", "Merge"],
+    active: 2,
   },
 ] as const;
 
 const AUDIENCES = [
   {
     title: "Agencies",
-    body: "Run client SEO/AEO/GEO fixes with an audit trail you can show — approve before write, verify after.",
+    body: "Client SEO/AEO/GEO fixes with an audit trail — approve before write, verify after.",
   },
   {
     title: "Founders",
-    body: "Ship title, meta, and FAQ schema without hiring another SEO retainer for the basics.",
+    body: "Ship title, meta, and FAQ schema without another SEO retainer for the basics.",
   },
   {
     title: "WordPress ops",
-    body: "Live deploy with backup, HTML verification, and automatic rollback if something looks wrong.",
+    body: "Live deploy with backup, HTML verification, and automatic rollback.",
   },
+] as const;
+
+const WEDGE = [
+  [
+    "vs Ahrefs / Semrush",
+    "They research. We execute approved on-site fixes with an audit trail.",
+  ],
+  [
+    "vs Yoast / Rank Math",
+    "They help manual WP edits. We scan, propose, then write only after you approve.",
+  ],
+  [
+    "vs Alli-style AI SEO",
+    "We prioritize live HTML verify + rollback — and work beyond WordPress.",
+  ],
+] as const;
+
+const HOME_PLANS = [
+  { id: "free" as const, href: "/signup", cta: "Start free" },
+  { id: "starter" as const, href: "/pricing", cta: "See Starter" },
+  { id: "agency" as const, href: "/pricing", cta: "See Agency" },
 ] as const;
 
 const FAQ_SCHEMA = [
   {
     q: `What is ${BRAND_NAME}?`,
-    a: `${BRAND_NAME} is an AI-powered SEO, AEO, and GEO growth engine. Connect a site, scan issues, approve safe fixes, and deploy with verify and rollback.`,
+    a: `${BRAND_NAME} is an AI-powered SEO, AEO and GEO growth engine. Connect a site, scan issues, approve safe fixes, and deploy with verification and rollback.`,
   },
   {
     q: "I'm new — what do I do first?",
@@ -106,7 +117,7 @@ const FAQ_SCHEMA = [
   },
   {
     q: "Will this replace Ahrefs / Semrush?",
-    a: "No. Those tools research and report. growthOS is the execution loop: scan → propose → approve → deploy → verify. Use research tools for keywords; use growthOS to ship safe on-site changes.",
+    a: `No. Those tools research and report. ${BRAND_NAME} is the execution loop: scan → propose → approve → deploy → verify. Use research tools for keywords; use ${BRAND_NAME} to ship safe on-site changes.`,
   },
   {
     q: "Do I need an OpenAI key?",
@@ -140,79 +151,6 @@ const FAQ_ITEMS = [
   { q: FAQ_SCHEMA[6].q, a: FAQ_SCHEMA[6].a },
 ];
 
-function DemoBlock({
-  kicker = "Product demo",
-  title = "60 seconds: approve → verify → rollback",
-  lead = "Watch the trust loop buyers need before they pay — not another feature tour.",
-}: {
-  kicker?: string;
-  title?: string;
-  lead?: string;
-}) {
-  return (
-    <section className="land-section" id="demo">
-      <p className="land-kicker">{kicker}</p>
-      <h2 className="land-h2">{title}</h2>
-      <p className="land-lead">{lead}</p>
-      <video
-        className="land-demo-video"
-        controls
-        playsInline
-        preload="metadata"
-        poster="/demo/growthos-loop-poster.jpg"
-      >
-        <source src="/demo/growthos-loop.mp4" type="video/mp4" />
-        Your browser does not support the video tag.{" "}
-        <a href="/demo/growthos-loop.mp4">Download the demo</a>.
-      </video>
-      <div className="land-cta-row" style={{ marginTop: 28 }}>
-        <a className="land-btn-primary" href="/signup">
-          <span>Start free — run this on your site</span>
-        </a>
-        <a className="land-btn-ghost" href="#start">
-          First-time walkthrough
-        </a>
-      </div>
-    </section>
-  );
-}
-
-function ConversionBand({
-  id,
-  title,
-  lead,
-}: {
-  id?: string;
-  title: string;
-  lead: string;
-}) {
-  return (
-    <section
-      id={id}
-      className="land-section land-convert"
-      aria-label="Get started"
-    >
-      <p className="land-kicker">Next step</p>
-      <h2 className="land-h2">{title}</h2>
-      <p className="land-lead">{lead}</p>
-      <div className="land-cta-row" style={{ marginTop: 28 }}>
-        <a className="land-btn-primary" href="/signup">
-          <span>Start free</span>
-        </a>
-        <a className="land-btn-ghost" href="#demo">
-          Watch the demo
-        </a>
-        <a className="land-btn-ghost" href="/pricing">
-          See pricing
-        </a>
-      </div>
-      <p className="land-hero-trust" style={{ marginTop: 16 }}>
-        Free plan · No card · Approve before every write
-      </p>
-    </section>
-  );
-}
-
 export function LandingPage({
   betaNotice = null,
 }: {
@@ -225,11 +163,10 @@ export function LandingPage({
         <div className="land-top">
           <BrandMark variant="header" />
           <nav className="land-nav">
-            <a href="#start">How to start</a>
+            <a href="#start">Product</a>
             <a href="#demo">Demo</a>
             <a href="/pricing">Pricing</a>
             <a href="/compare">Compare</a>
-            <a href="#trust">Trust</a>
             <a className="land-nav-login" href="/signup">
               Start free
             </a>
@@ -241,18 +178,20 @@ export function LandingPage({
         <div className="land-hero-main">
           <div className="land-hero-copy">
             <BrandMark variant="hero" href={null} />
+            <p className="land-eyebrow">
+              {BRAND_NAME} — AI SEO, AEO &amp; GEO Growth Engine
+            </p>
             <h1 className="land-headline">
               <span className="land-headline-lead">
-                AI SEO fixes that{" "}
-                <span className="land-headline-accent">never</span>
-              </span>
-              <br />
-              <span className="land-headline-display">write without you</span>
+                Your website&apos;s{" "}
+                <span className="land-headline-accent">relentless</span>
+              </span>{" "}
+              <span className="land-headline-display">growth engine</span>
             </h1>
             <p className="land-support">
-              <BrandText /> scans SEO · AEO · GEO issues, shows a before/after, and
-              only deploys after you approve — then verifies live HTML and rolls back
-              if something breaks.
+              Stop collecting SEO PDFs. <BrandText /> scans SEO · AEO · GEO issues,
+              proposes safe fixes, and only writes after you approve — with verify
+              &amp; rollback on WordPress.
             </p>
             <div className="land-cta-row">
               <a className="land-btn-primary" href="/signup">
@@ -268,101 +207,129 @@ export function LandingPage({
             </p>
           </div>
         </div>
+      </section>
 
-        <div className="land-stage" aria-hidden={false}>
-          <div className="land-stage-inner">
-            <p className="land-stage-label">The product loop</p>
-            <div className="land-timeline" role="list">
-              {STEPS.map((s) => (
-                <div
-                  key={s.title}
-                  className={`land-step${s.live ? " is-live" : ""}`}
-                  role="listitem"
-                >
-                  <span className="land-step-dot" aria-hidden />
-                  <p className="land-step-title">{s.title}</p>
-                  <p className="land-step-meta">{s.meta}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+      <section className="land-stage" id="loop" aria-label="The product loop">
+        <div className="land-stage-inner">
+          <p className="land-stage-label">The product loop</p>
+          <ol className="land-timeline">
+            {PRODUCT_LOOP.map((step) => (
+              <li key={step.title} className="land-step">
+                <span
+                  className={`land-step-dot${"plain" in step && step.plain ? " land-step-dot--plain" : ""}`}
+                  aria-hidden
+                />
+                <p className="land-step-title">{step.title}</p>
+                <p className="land-step-meta">{step.meta}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      <section id="start" className="land-section">
-        <p className="land-kicker">First-time users</p>
-        <h2 className="land-h2">Your first 10 minutes</h2>
-        <p className="land-lead">
-          One path. No jargon maze. Finish with a verified change — or a safe PR /
-          fix pack if you are not on WordPress yet.
-        </p>
-        <div className="land-flow" style={{ marginTop: 40 }}>
+      <section id="start" className="land-section land-section--mist">
+        <div className="land-editorial land-editorial--center">
+          <div>
+            <p className="land-kicker">How to start</p>
+            <h2 className="land-h2">Your first 10 minutes</h2>
+            <p className="land-lead">
+              One path from signup to a verified change — connect, scan, approve,
+              then verify live.
+            </p>
+          </div>
+          <p className="land-text-cta land-text-cta--top">
+            <a href="/signup">Create free account →</a>
+          </p>
+        </div>
+        <div className="land-steps-row">
           {FIRST_RUN.map((s) => (
-            <div key={s.n} className="land-flow-item">
-              <div className="land-flow-num">{s.n}</div>
-              <div>
-                <strong>{s.title}</strong>
-                <span>{s.body}</span>
-              </div>
+            <div key={s.n} className="land-steps-cell">
+              <p className="land-steps-n">{s.n}</p>
+              <strong>{s.title}</strong>
+              <span>{s.body}</span>
             </div>
           ))}
         </div>
-        <div className="land-cta-row" style={{ marginTop: 28 }}>
-          <a className="land-btn-primary" href="/signup">
-            <span>Create free account</span>
-          </a>
-          <a className="land-btn-ghost" href="#demo">
-            Prefer to watch first
-          </a>
-        </div>
       </section>
 
-      <DemoBlock />
+      <section className="land-section land-section--surface" id="demo">
+        <p className="land-kicker">Product demo</p>
+        <h2 className="land-h2">60 seconds: approve → verify → rollback</h2>
+        <p className="land-lead">
+          The trust loop buyers need before they pay — not another feature tour.
+        </p>
+        <div className="land-demo-frame">
+          <p className="land-demo-meta">
+            <span className="land-demo-brand">
+              <span className="land-logo-mark land-logo-mark--tiny">
+                <Image
+                  src="/logo-mark.png"
+                  alt={`${BRAND_NAME} logo`}
+                  width={466}
+                  height={338}
+                />
+              </span>
+              {BRAND_NAME} product loop
+            </span>
+            <span>~60 sec · with sound off OK</span>
+          </p>
+          <video
+            className="land-demo-video"
+            controls
+            playsInline
+            preload="metadata"
+            poster="/demo/growthos-loop-poster.jpg"
+          >
+            <source src="/demo/growthos-loop.mp4" type="video/mp4" />
+            Your browser does not support the video tag.{" "}
+            <a href="/demo/growthos-loop.mp4">Download the demo</a>.
+          </video>
+        </div>
+        <p className="land-text-cta">
+          <a href="/signup">Start free and run this on your site →</a>
+        </p>
+      </section>
 
-      <section id="trust" className="land-section">
+      <section id="trust" className="land-section land-section--mist">
         <div className="land-split land-split-wide">
           <div>
             <p className="land-kicker">Trust &amp; security</p>
             <h2 className="land-h2">Built like a transaction, not a chatbot</h2>
             <p className="land-lead">
-              Teams do not fear AI ideas — they fear unsupervised writes on a live
-              client site. <BrandText /> treats every deploy as atomic, auditable,
-              and reversible.
+              Teams do not fear AI ideas — they fear unsupervised writes.{" "}
+              <BrandText /> treats every deploy as atomic, auditable, and reversible.
             </p>
           </div>
           <ul className="land-trust-list">
             <li>Human approval before every write</li>
-            <li>Backup stored before WordPress deploy</li>
+            <li>Backup before WordPress deploy</li>
             <li>Live HTML verification — never assume success</li>
             <li>Automatic rollback when verification fails</li>
-            <li>Mission Timeline audit trail you can show a client</li>
+            <li>Mission Timeline audit trail for clients</li>
           </ul>
-        </div>
-        <div className="land-flow" style={{ marginTop: 48 }}>
-          {TRUST_PROTOCOL.map((item, i) => (
-            <div key={item.title} className="land-flow-item">
-              <div className="land-flow-num">
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <div>
-                <strong>{item.title}</strong>
-                <span>{item.body}</span>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 
-      <section id="proof" className="land-section">
-        <p className="land-kicker">Real-world proof</p>
-        <h2 className="land-h2">What a pilot actually looks like</h2>
+      <section id="proof" className="land-section land-section--surface">
+        <p className="land-kicker">Pilot scenarios</p>
+        <h2 className="land-h2">What running it looks like</h2>
         <p className="land-lead">
-          Honest beta scenarios — same loop, different connect modes. Not stock
-          logos. The proof is the Mission Timeline you can replay.
+          Same loop, different connect modes. Mini timelines stand in for product
+          UI — not stock logos.
         </p>
         <div className="land-proof" style={{ marginTop: 40 }}>
           {PILOT_PROOF.map((p) => (
             <article key={p.who} className="land-proof-item">
+              <div className="land-proof-rail" aria-hidden>
+                {p.rail.map((step, i) => (
+                  <span
+                    key={step}
+                    className={`land-proof-chip${i === p.active ? " is-live" : i < p.active ? " is-done" : ""}`}
+                  >
+                    {step}
+                  </span>
+                ))}
+              </div>
               <p className="land-proof-who">{p.who}</p>
               <h3 className="land-proof-outcome">{p.outcome}</h3>
               <p className="land-proof-story">{p.story}</p>
@@ -371,14 +338,9 @@ export function LandingPage({
         </div>
       </section>
 
-      <ConversionBand
-        title="Ready to run the loop on your site?"
-        lead="Start free, connect one site, approve one fix. Upgrade only when Free caps get in the way."
-      />
-
-      <section id="for" className="land-section">
+      <section id="for" className="land-section land-section--mist">
         <p className="land-kicker">Who it&apos;s for</p>
-        <h2 className="land-h2">Built for people who ship, not slide decks</h2>
+        <h2 className="land-h2">Built for people who ship</h2>
         <p className="land-lead">
           If broken client sites or slow SEO vendors are the risk, this loop is for
           you.
@@ -393,144 +355,117 @@ export function LandingPage({
         </div>
       </section>
 
-      <section id="how" className="land-section">
-        <p className="land-kicker">How it works</p>
-        <h2 className="land-h2">From connect to verified change</h2>
-        <p className="land-lead">
-          One operational loop agencies can trust — not another audit PDF.
-        </p>
-        <div className="land-flow" style={{ marginTop: 40 }}>
-          {[
-            [
-              "01",
-              "Connect",
-              "WordPress, GitHub, ZIP upload, or live URL — pick how you connect.",
-            ],
-            [
-              "02",
-              "Scan",
-              "Crawl capped pages. Deterministic issues become proposals.",
-            ],
-            [
-              "03",
-              "Approve",
-              "Review before/after. Nothing writes until you say so.",
-            ],
-            [
-              "04",
-              "Deploy & verify",
-              "WP live write, GitHub PR, ZIP fix pack, or Live URL apply guide — with verify/rollback per mode.",
-            ],
-          ].map(([n, t, d]) => (
-            <div key={n} className="land-flow-item">
-              <div className="land-flow-num">{n}</div>
-              <div>
+      <section id="wedge" className="land-section land-section--surface">
+        <div className="land-editorial land-editorial--stack">
+          <p className="land-kicker">Why {BRAND_NAME}</p>
+          <h2 className="land-h2 land-h2--wide">
+            Research finds issues. Editors help you type. We ship approved fixes.
+          </h2>
+          <p className="land-lead land-lead--wide">
+            <BrandText /> is the missing middle for SEO · AEO · GEO: approve →
+            deploy → verify → rollback — across WordPress, GitHub, ZIP, and live URL.
+          </p>
+          <ul className="land-wedge-lines">
+            {WEDGE.map(([t, d]) => (
+              <li key={t}>
                 <strong>{t}</strong>
                 <span>{d}</span>
-              </div>
-            </div>
-          ))}
+              </li>
+            ))}
+          </ul>
+          <p className="land-text-cta">
+            <a href="/compare">Full comparison table →</a>
+          </p>
         </div>
       </section>
 
-      <section id="wedge" className="land-section">
-        <p className="land-kicker">Why buy growthOS</p>
-        <h2 className="land-h2">What&apos;s new vs tools you already know</h2>
-        <p className="land-lead">
-          Ahrefs finds issues. Yoast helps you edit WordPress. Many AI SEO tools
-          write too freely. <BrandText /> is the missing middle: approve → deploy →
-          verify → rollback across SEO · AEO · GEO.
-        </p>
-        <div className="land-flow" style={{ marginTop: 40 }}>
-          {[
-            [
-              "01",
-              "vs Ahrefs / Semrush",
-              "They research. We execute approved on-site fixes with an audit trail.",
-            ],
-            [
-              "02",
-              "vs Yoast / Rank Math",
-              "They help manual edits inside WP. We scan and propose, then write only after you approve.",
-            ],
-            [
-              "03",
-              "vs Alli-style AI SEO",
-              "We prioritize live HTML verification + rollback and work beyond WordPress (GitHub / ZIP / Live URL).",
-            ],
-            [
-              "04",
-              "Our wedge",
-              "Hosted Mission Control + multi-connect + trust loop you can show a client.",
-            ],
-          ].map(([n, t, d]) => (
-            <div key={n} className="land-flow-item">
-              <div className="land-flow-num">{n}</div>
-              <div>
-                <strong>{t}</strong>
-                <span>{d}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-        <p style={{ marginTop: 20 }}>
-          <a href="/compare">Full comparison table →</a>
-        </p>
-      </section>
-
-      <section className="land-section">
-        <p className="land-kicker">Beta scope</p>
-        <h2 className="land-h2">Start with three high-ROI changes</h2>
-        <p className="land-lead">
-          Meta title, meta description, and FAQ schema — plus canonicals. Narrow on
-          purpose so the trust loop is proven before we expand change types.
-        </p>
-      </section>
-
-      <section className="land-section">
+      <section id="pricing" className="land-section land-section--mist">
         <p className="land-kicker">Pricing</p>
         <h2 className="land-h2">Simple plans. Exact limits.</h2>
         <p className="land-lead">
-          Free for private beta. Upgrade when site and scan limits need to grow.
+          Meta title, meta description, FAQ schema, and canonicals in beta — narrow
+          on purpose so the trust loop is proven first.
         </p>
-        <div className="land-price-row">
-          {[
-            ["Free", "₹0 · 2 sites · 20 scans/mo"],
-            ["Starter", "₹3,999/mo · 10 sites · 200 scans"],
-            ["Agency", "₹15,999/mo · 50 sites · 2,000 scans"],
-          ].map(([plan, price]) => (
-            <div key={plan} className="land-price-item">
-              <strong>{plan}</strong>
-              <span>{price}</span>
-            </div>
-          ))}
+        <div className="land-plan-grid" style={{ marginTop: 40 }}>
+          {HOME_PLANS.map((plan) => {
+            const limits = PLAN_LIMITS[plan.id];
+            const featured = plan.id === "starter";
+            return (
+              <article
+                key={plan.id}
+                className={`land-plan${featured ? " is-featured" : ""}`}
+              >
+                {featured ? (
+                  <p className="land-plan-badge">Most teams start here</p>
+                ) : null}
+                <h3 className="land-plan-name">{limits.label}</h3>
+                <p className="land-plan-price">
+                  <span>
+                    {plan.id === "free"
+                      ? "₹0"
+                      : `₹${limits.priceInr.toLocaleString("en-IN")}`}
+                  </span>
+                  <small>{plan.id === "free" ? "private beta" : "/ month"}</small>
+                </p>
+                <ul className="land-plan-features">
+                  <li>
+                    <strong>{limits.sites} sites</strong>
+                  </li>
+                  <li>
+                    <strong>
+                      {limits.scansPerMonth.toLocaleString("en-IN")} scans / month
+                    </strong>
+                  </li>
+                </ul>
+                <a
+                  className="land-btn-ghost"
+                  href={plan.href}
+                  style={{ marginTop: 8, placeContent: "center" }}
+                >
+                  {plan.cta}
+                </a>
+              </article>
+            );
+          })}
         </div>
-        <p style={{ marginTop: 20 }}>
-          <a href="/pricing">Compare plans →</a>
+        <p className="land-text-cta">
+          <a href="/pricing">Compare plans in detail →</a>
         </p>
       </section>
 
-      <ConversionBand
+      <section
         id="get-started"
-        title="Start free. Prove the loop. Then upgrade."
-        lead="Primary path: signup → connect → scan → approve. Waitlist only if you want a guided beta call."
-      />
+        className="land-section land-convert land-section--ink"
+        aria-label="Get started"
+      >
+        <p className="land-kicker">Next step</p>
+        <h2 className="land-h2">Start free. Prove the loop.</h2>
+        <p className="land-lead">
+          Sign up → connect → scan → approve. Upgrade only when Free caps get in
+          the way.
+        </p>
+        <div className="land-cta-row">
+          <a className="land-btn-primary" href="/signup">
+            <span>Start free</span>
+          </a>
+          <a className="land-btn-ghost" href="#demo">
+            Watch the demo
+          </a>
+        </div>
+        <p className="land-hero-trust">
+          Free plan · No card · Approve before every write
+        </p>
+      </section>
 
-      <section id="beta" className="land-section land-beta">
+      <section id="beta" className="land-section land-beta land-section--surface">
         <div className="land-beta-inner">
           <div className="land-beta-copy">
             <p className="land-kicker">Optional · guided beta</p>
-            <h2 className="land-h2 land-beta-title">Prefer a walkthrough call?</h2>
+            <h2 className="land-h2 land-beta-title">Prefer a walkthrough?</h2>
             <p className="land-lead land-beta-lead">
-              Most people should <a href="/signup">start free</a> and run the loop
-              themselves. Use the waitlist only if you want early access coaching —
-              especially WordPress deploy → verify → rollback.
+              Most people should <a href="/signup">start free</a>. Use the waitlist
+              only if you want a guided call.
             </p>
-            <ol className="land-next-steps">
-              <li>We review your request within a few days</li>
-              <li>You connect a site and run a scan</li>
-              <li>You approve a safe change and see verify/rollback</li>
-            </ol>
           </div>
           <div className="land-beta-panel">
             <p className="land-form-heading">Request beta access</p>
@@ -574,8 +509,8 @@ export function LandingPage({
                   Could not join the waitlist. Please try again.
                 </p>
               ) : null}
-              <button className="land-btn-primary land-form-submit" type="submit">
-                <span>Request beta access</span>
+              <button className="land-btn-ghost land-form-submit" type="submit">
+                Request beta access
               </button>
               <p className="land-form-footnote">
                 Faster path: <a href="/signup">Create a free account</a>
@@ -585,7 +520,7 @@ export function LandingPage({
         </div>
       </section>
 
-      <section className="land-section land-faq" id="faq">
+      <section className="land-section land-faq land-section--mist" id="faq">
         <p className="land-kicker">FAQ</p>
         <h2 className="land-h2">Straight answers</h2>
         <div style={{ marginTop: 32 }}>
@@ -612,23 +547,7 @@ export function LandingPage({
         />
       </section>
 
-      <footer className="land-footer">
-        <BrandMark variant="header" />
-        <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-          <a href="/#start">How to start</a>
-          <a href="/#demo">Demo</a>
-          <a href="/pricing">Pricing</a>
-          <a href="/compare">Compare</a>
-          <a href="/#trust">Trust</a>
-          <a href="/#faq">FAQ</a>
-          <a href="/signup">Signup</a>
-          <a href="/login">Login</a>
-          <a href="/llms.txt">llms.txt</a>
-        </nav>
-        <span className="land-footer-note">
-          <BrandText /> · Start free · Approve before write · Verify after deploy
-        </span>
-      </footer>
+      <MarketingFooter />
     </main>
   );
 }

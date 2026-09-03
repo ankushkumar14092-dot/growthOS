@@ -1,12 +1,17 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
-export const alt = "growthOS — AI SEO, AEO & GEO growth engine";
+export const alt = "GrowthOS logo";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-/** Share card — matches the previous branded preview with the growthOS mark. */
-export default function OpenGraphImage() {
+/** Share preview: logo is the hero — not a text-heavy card. */
+export default async function OpenGraphImage() {
+  const logoPath = join(process.cwd(), "public", "logo-mark.png");
+  const buf = await readFile(logoPath);
+  const logoSrc = `data:image/png;base64,${buf.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -15,75 +20,35 @@ export default function OpenGraphImage() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "64px 72px",
-          background:
-            "linear-gradient(145deg, #0b1220 0%, #0f2744 55%, #0d9488 160%)",
-          color: "#f8fafc",
-          fontFamily: "system-ui, sans-serif",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#ffffff",
+          gap: 32,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: 18,
-              background: "#0066ff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 36,
-              fontWeight: 800,
-              color: "#ffffff",
-            }}
-          >
-            g
-          </div>
-          <div style={{ display: "flex", fontSize: 40, fontWeight: 700 }}>
-            <span style={{ color: "#e2e8f0" }}>growth</span>
-            <span style={{ color: "#5eead4" }}>OS</span>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div
-            style={{
-              display: "flex",
-              fontSize: 64,
-              fontWeight: 800,
-              lineHeight: 1.05,
-              letterSpacing: "-0.03em",
-              maxWidth: 980,
-            }}
-          >
-            Your website&apos;s relentless growth engine
-          </div>
-          <div
-            style={{
-              display: "flex",
-              fontSize: 28,
-              color: "#cbd5e1",
-              maxWidth: 860,
-              lineHeight: 1.35,
-            }}
-          >
-            AI-powered SEO · AEO · GEO — scan, approve, deploy with verify &amp;
-            rollback.
-          </div>
-        </div>
-
+        <img
+          alt="GrowthOS logo"
+          width={640}
+          height={464}
+          src={logoSrc}
+          style={{
+            width: 640,
+            height: 464,
+            objectFit: "contain",
+          }}
+        />
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontSize: 22,
-            color: "#94a3b8",
+            alignItems: "baseline",
+            fontSize: 52,
+            fontWeight: 700,
+            letterSpacing: "-0.03em",
+            fontFamily: "system-ui, sans-serif",
           }}
         >
-          <span>grothos.in</span>
-          <span>Connect → Scan → Approve → Deploy</span>
+          <span style={{ color: "#0b1220" }}>Growth</span>
+          <span style={{ color: "#0d9488" }}>OS</span>
         </div>
       </div>
     ),

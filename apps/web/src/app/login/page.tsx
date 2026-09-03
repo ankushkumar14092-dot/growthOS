@@ -70,7 +70,7 @@ export default function LoginPage() {
         <section className="auth-faq" style={faqBox} aria-label="FAQ">
           <h2 style={faqTitle}>FAQ</h2>
           <details>
-            <summary>What is growthOS?</summary>
+            <summary>What is GrowthOS?</summary>
             <p style={faqBody}>
               <BrandText /> helps teams scan sites for SEO · AEO · GEO issues,
               approve safe fixes, then deploy with verify and rollback where supported.

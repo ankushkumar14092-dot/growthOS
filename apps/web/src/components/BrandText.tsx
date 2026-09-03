@@ -21,7 +21,7 @@ export function BrandText({
 
   return (
     <span className={base}>
-      <span className="brand-text-growth">growth</span>
+      <span className="brand-text-growth">Growth</span>
       <span className="brand-text-os">OS</span>
     </span>
   );
