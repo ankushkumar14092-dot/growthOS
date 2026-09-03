@@ -56,6 +56,10 @@ const API_ERROR_LABELS: Record<string, string> = {
   razorpay_plan_not_configured:
     "Paid plans aren’t set up yet. Add Razorpay plan IDs on the API, or stay on Free for now.",
   checkout_not_needed_for_free: "You’re already on the Free plan.",
+  site_limit_reached:
+    "Site limit reached for your plan. Upgrade on Billing to add more sites.",
+  scan_limit_reached:
+    "Monthly scan limit reached for your plan. Upgrade on Billing for more scans.",
   org_not_found: "Workspace not found.",
   unauthorized: "Please sign in again.",
   Forbidden: "You don’t have permission for that.",
@@ -557,13 +561,26 @@ export type BillingSummaryDto = {
   planLabel: string;
   priceLabel: string;
   razorpayConfigured: boolean;
-  limits: { sites: number; scansPerMonth: number; label: string; priceLabel: string };
+  limits: {
+    sites: number;
+    scansPerMonth: number;
+    label: string;
+    priceLabel: string;
+    priceInr?: number;
+  };
   usage: {
     sites: number;
     scansThisPeriod: number;
     byMetric: Record<string, { quantity: number; events: number }>;
   };
-  plans: Array<{ id: string; sites: number; scansPerMonth: number; label: string; priceLabel: string }>;
+  plans: Array<{
+    id: string;
+    sites: number;
+    scansPerMonth: number;
+    label: string;
+    priceLabel: string;
+    priceInr?: number;
+  }>;
   subscription: {
     id: string;
     active: boolean;

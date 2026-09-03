@@ -1,6 +1,8 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { ForbiddenException, Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Job, Queue, Worker } from "bullmq";
+import { BillingService } from "../billing/billing.service";
+import { UsageService } from "../billing/usage.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { ScanQueueService } from "./scan-queue.service";
 
@@ -21,6 +23,8 @@ export class ScheduleQueueService implements OnModuleInit, OnModuleDestroy {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
     private readonly scans: ScanQueueService,
+    private readonly billing: BillingService,
+    private readonly usage: UsageService,
   ) {}
 
   async onModuleInit() {
@@ -113,10 +117,23 @@ export class ScheduleQueueService implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
+    try {
+      await this.billing.assertCanStartScan(site.organizationId);
+    } catch (err) {
+      if (err instanceof ForbiddenException) {
+        this.logger.log(`skip scheduled scan ${siteId}: scan_limit_reached`);
+        return;
+      }
+      throw err;
+    }
+
     const job = await this.prisma.jobRun.create({
       data: { siteId, status: "queued" },
     });
     await this.scans.enqueue({ jobRunId: job.id, siteId });
+    await this.usage.record(site.organizationId, "scan", {
+      meta: { siteId, jobRunId: job.id, reason },
+    });
     this.logger.log(`scheduled scan enqueued ${job.id} for ${site.domain} (${reason})`);
   }
 

@@ -15,6 +15,7 @@ import {
   MembershipRole,
   Prisma,
 } from "@prisma/client";
+import { BillingService } from "../billing/billing.service";
 import { ConnectionRegistry } from "../connections/connection.registry";
 import { parseRepo } from "../connections/github.adapter";
 import { ensureAbsoluteHttpUrl } from "../connections/normalize-origin";
@@ -39,6 +40,7 @@ export class SitesService {
     private readonly zipStorage: ZipStorageService,
     private readonly audit: AuditLogService,
     private readonly scheduleQueue: ScheduleQueueService,
+    private readonly billing: BillingService,
   ) {}
 
   listConnectionTypes() {
@@ -47,6 +49,7 @@ export class SitesService {
 
   async create(userId: string, dto: CreateSiteDto) {
     await this.requireMembership(userId, dto.organizationId);
+    await this.billing.assertCanAddSite(dto.organizationId);
 
     const connectionType = dto.connectionType as ConnectionType;
     let domain = dto.domain.trim();

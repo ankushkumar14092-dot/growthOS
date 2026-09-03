@@ -7,35 +7,11 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MembershipRole, PlanTier } from "@prisma/client";
-import { PLAN_LIMITS as SHARED_PLAN_LIMITS } from "@ai-growth-os/shared";
+import { PLAN_LIMITS } from "@ai-growth-os/shared";
 import { createHmac, timingSafeEqual } from "crypto";
 import { PrismaService } from "../prisma/prisma.service";
 import { primaryWebOrigin } from "../cors-origins";
 import { UsageService } from "./usage.service";
-
-const PLAN_LIMITS: Record<
-  PlanTier,
-  { sites: number; scansPerMonth: number; label: string; priceLabel: string }
-> = {
-  free: {
-    sites: SHARED_PLAN_LIMITS.free.sites,
-    scansPerMonth: SHARED_PLAN_LIMITS.free.scansPerMonth,
-    label: SHARED_PLAN_LIMITS.free.label,
-    priceLabel: SHARED_PLAN_LIMITS.free.priceLabel,
-  },
-  starter: {
-    sites: SHARED_PLAN_LIMITS.starter.sites,
-    scansPerMonth: SHARED_PLAN_LIMITS.starter.scansPerMonth,
-    label: SHARED_PLAN_LIMITS.starter.label,
-    priceLabel: SHARED_PLAN_LIMITS.starter.priceLabel,
-  },
-  agency: {
-    sites: SHARED_PLAN_LIMITS.agency.sites,
-    scansPerMonth: SHARED_PLAN_LIMITS.agency.scansPerMonth,
-    label: SHARED_PLAN_LIMITS.agency.label,
-    priceLabel: SHARED_PLAN_LIMITS.agency.priceLabel,
-  },
-};
 
 @Injectable()
 export class BillingService {
@@ -100,7 +76,11 @@ export class BillingService {
       },
       plans: Object.entries(PLAN_LIMITS).map(([id, v]) => ({
         id,
-        ...v,
+        sites: v.sites,
+        scansPerMonth: v.scansPerMonth,
+        label: v.label,
+        priceLabel: v.priceLabel,
+        priceInr: v.priceInr,
       })),
     };
   }
@@ -235,7 +215,7 @@ export class BillingService {
     plan: PlanTier,
     webOrigin: string,
   ) {
-    const amount = plan === "agency" ? 1_599_900 : 399_900;
+    const amount = PLAN_LIMITS[plan].priceInr * 100;
     const brand = "growthOS";
     const link = await this.razorpayRequest(
       keyId,
@@ -484,6 +464,53 @@ export class BillingService {
       throw new BadRequestException("razorpay_request_failed");
     }
     return json;
+  }
+
+  /** Enforce site caps from shared PLAN_LIMITS (same as marketing pricing). */
+  async assertCanAddSite(organizationId: string) {
+    const { limits, siteCount } = await this.getOrgPlanUsage(organizationId);
+    if (siteCount >= limits.sites) {
+      throw new ForbiddenException("site_limit_reached");
+    }
+  }
+
+  /** Enforce monthly scan caps from shared PLAN_LIMITS (rolling 30 days). */
+  async assertCanStartScan(organizationId: string) {
+    const { limits, scansThisPeriod } =
+      await this.getOrgPlanUsage(organizationId);
+    if (scansThisPeriod >= limits.scansPerMonth) {
+      throw new ForbiddenException("scan_limit_reached");
+    }
+  }
+
+  private async getOrgPlanUsage(organizationId: string) {
+    const org = await this.prisma.organization.findFirst({
+      where: { id: organizationId, deletedAt: null },
+    });
+    if (!org) throw new NotFoundException("org_not_found");
+
+    let sub = await this.prisma.subscription.findFirst({
+      where: { organizationId, active: true },
+      orderBy: { createdAt: "desc" },
+    });
+    if (!sub) {
+      sub = await this.prisma.subscription.create({
+        data: {
+          organizationId,
+          plan: org.plan,
+          active: true,
+        },
+      });
+    }
+
+    const plan = sub.plan;
+    const limits = PLAN_LIMITS[plan];
+    const siteCount = await this.prisma.site.count({
+      where: { organizationId, deletedAt: null },
+    });
+    const usage = await this.usage.summary(organizationId, 30);
+    const scansThisPeriod = usage.byMetric.scan?.quantity ?? 0;
+    return { plan, limits, siteCount, scansThisPeriod };
   }
 
   private async requireMembership(userId: string, organizationId: string) {

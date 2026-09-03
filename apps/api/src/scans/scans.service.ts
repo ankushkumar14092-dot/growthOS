@@ -5,6 +5,7 @@ import {
 } from "@nestjs/common";
 import { MembershipRole } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
+import { BillingService } from "../billing/billing.service";
 import { UsageService } from "../billing/usage.service";
 import { AuditLogService } from "./audit-log.service";
 import { ScanQueueService } from "./scan-queue.service";
@@ -16,10 +17,12 @@ export class ScansService {
     private readonly queue: ScanQueueService,
     private readonly audit: AuditLogService,
     private readonly usage: UsageService,
+    private readonly billing: BillingService,
   ) {}
 
   async startAudit(userId: string, siteId: string) {
     const site = await this.getSiteForUser(userId, siteId);
+    await this.billing.assertCanStartScan(site.organizationId);
     const job = await this.prisma.jobRun.create({
       data: {
         siteId: site.id,
