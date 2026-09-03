@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "installCommand": "cd ../.. && npm cache clean --force && npm install",
+  "installCommand": "cd ../.. && rm -f package-lock.json && npm install",
   "buildCommand": "cd ../.. && npm run build -w @ai-growth-os/shared && npm run build -w @ai-growth-os/web"
 }
